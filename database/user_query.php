@@ -7,10 +7,10 @@
 			user_email, 
 			user_grade 
 			from tbUser 
-			where user_email = '$user_email' 
+			where user_email = '$userEmail' 
 			and user_password = SHA1(UNHEX(SHA1('$userPassword'))) 
 			and user_state = 'U001_001';";
-
+			
 		$result = mysqli_query($connection, $query);
 
 		if($result == false) {
