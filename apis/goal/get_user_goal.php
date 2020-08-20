@@ -16,7 +16,7 @@ try {
 
 	if($numResults > 0) {
 
-        echo '{"result":"success", ';
+        echo '{"result":"success", "goalInfo":[';
 
         $goalSeqNo = "";
         $readingBible = "";
@@ -26,10 +26,10 @@ try {
 				echo",";
 			}
         }
-		echo '}';
+		echo ']}';
     }
     else {
-        echo '{"result":"fail", "errorCode": "01", "errorMessage":"There are no goals set."}';
+        echo '{"result":"fail", "errorCode": "01", "errorMessage": "There are no goals set."}';
     }
 
 }

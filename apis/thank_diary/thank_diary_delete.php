@@ -17,7 +17,7 @@ try {
         echo '{"result":"success"}';
     }
     else {
-        echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "'.$commonError["message"].'"}';
+        echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
     }
 }
 catch (Exception $e) {

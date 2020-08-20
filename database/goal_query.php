@@ -1,7 +1,28 @@
 <?php
     function getUserGoal($userSeqNo) {
         global $connection;
-        $query = "Select goal_seq_no goalSeqNo, user_seq_no userSeqNo, reading_bible readingBible, thank_diary thankDiary, qt_record qtRecord, praying from tbGoal where user_seq_no = '" .$userSeqNo ."';";
+        $query = "Select 
+            goal_seq_no goalSeqNo, 
+            A.user_seq_no userSeqNo, 
+            B.user_bible_plan_seq_no userBiblePlanSeqNo,
+            IF(reading_bible, 'true', 'false') as readingBible, 
+            IF(thank_diary, 'true', 'false') as thankDiary, 
+            IF(qt_record, 'true', 'false') as qtRecord, 
+            IF(qt_alarm, 'true', 'false') as qtAlarm,
+            qt_time qtTime,
+            IF(praying, 'true', 'false') as praying, 
+            IF(praying_alarm, 'true', 'false') as prayingAlarm,
+            praying_time prayingTime, 
+            praying_duration prayingDuration, 
+            goal_set_date goalSetDate,
+            B.bible_plan_id biblePlanId,
+            B.custom_bible customBible,
+            B.plan_period planPeriod
+        from tbGoal as A
+        LEFT JOIN tbUserBiblePlan as B
+        ON A.user_seq_no = B.user_seq_no
+        and A.user_seq_no = '" .$userSeqNo ."'
+        and B.plan_status = 'P002_001';";
         $result = mysqli_query($connection, $query);
 
         if($result == false) {
@@ -11,9 +32,35 @@
     }
 
 
-	function setUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $praying, $prayingTime, $prayingDuration) {
+	function setUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration) {
 		global $connection;
-        $query = "Insert into tbGoal(user_seq_no, reading_bible, thank_diary, qt_record, praying, praying_time, praying_duration, goal_set_date, create_date) values('$userSeqNo', '$readingBible', '$thankDiary', '$qtRecord', '$praying', '$prayingTime', '$prayingDuration', NOW(), NOW());";
+        $query = "Insert into tbGoal(
+            user_seq_no, 
+            reading_bible, 
+            thank_diary, 
+            qt_record, 
+            qt_alarm,
+            qt_time,
+            praying, 
+            praying_alarm,
+            praying_time, 
+            praying_duration, 
+            goal_set_date, 
+            create_date
+            ) 
+            values(
+                '$userSeqNo', 
+                '$readingBible', 
+                '$thankDiary', 
+                '$qtRecord', 
+                '$qtAlarm', 
+                '$qtTime', 
+                '$praying', 
+                '$prayingAlarm', 
+                '$prayingTime', 
+                '$prayingDuration', 
+                NOW(), 
+                NOW());";
         
 		$result = mysqli_query($connection, $query);
 
@@ -23,10 +70,21 @@
 		return $result;
     }
 
-	function updateUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $praying, $prayingTime, $prayingDuration) {
+	function updateUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration) {
         try {
             global $connection;
-            $query = "Update tbGoal set reading_bible='$readingBible', thank_diary='$thankDiary', qt_record='$qtRecord', praying='$praying', praying_time='$prayingTime', praying_duration='$prayingDuration' where user_seq_no='$userSeqNo';";
+            $query = "Update tbGoal set 
+            reading_bible='$readingBible', 
+            thank_diary='$thankDiary', 
+            qt_record='$qtRecord', 
+            qt_time='$qtTime', 
+            qt_alarm='$qtAlarm', 
+            praying='$praying', 
+            praying_alarm='$prayingAlarm', 
+            praying_time='$prayingTime', 
+            praying_duration='$prayingDuration', 
+            update_date=NOW() 
+            where user_seq_no='$userSeqNo';";
 
             $result = mysqli_query($connection, $query);
 
@@ -39,6 +97,6 @@
             return "Fail : ".$ex->getMessage()."<br>";
         }
 
-	}
+    }
 
 ?>

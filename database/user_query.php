@@ -61,7 +61,7 @@
 	function updateUserPassword($userSeqNo, $userPassword) {
 		global $connection;
 		$query = "Update tbUser set 
-			user_password='SHA1(UNHEX(SHA1('$userPassword'))) 
+			user_password='SHA1(UNHEX(SHA1('$userPassword'))), update_date=NOW() 
 			where user_seq_no='$userSeqNo';";
 
 		$result = mysqli_query($connection, $query);
@@ -75,7 +75,7 @@
 	function updateUserStatus($userSeqNo, $statusCode) {
 		global $connection;
 		$query = "Update tbUser set 
-			user_state='$statusCode' 
+			user_state='$statusCode', update_date=NOW() 
 			where user_seq_no='$userSeqNo';";
 
 		$result = mysqli_query($connection, $query);

@@ -76,7 +76,7 @@
 	function updateThankDiary($thankDiarySeqNo, $userSeqNo, $title, $diaryDate, $content) {
         try {
             global $connection;
-            $query = "Update tbThankDiary set title='$title', diary_date='$diaryDate', content='$content' where thank_diary_seq_no='$thankDiarySeqNo' and user_seq_no='$userSeqNo';";
+            $query = "Update tbThankDiary set title='$title', diary_date='$diaryDate', content='$content', update_date=NOW() where thank_diary_seq_no='$thankDiarySeqNo' and user_seq_no='$userSeqNo';";
 
             $result = mysqli_query($connection, $query);
 

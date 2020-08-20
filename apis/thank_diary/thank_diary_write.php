@@ -7,14 +7,7 @@ try {
 
     $json = file_get_contents('php://input');
     $obj = json_decode($json,true);
-/* 
-    $thankDiarySeqNo = 1;
-    $userSeqNo = 3;
-    $title = '하하하';
-    $diaryDate = '2011-08-21 14:11:09';
-    $content = '내용입니다 하하';
-  */
-	 
+
     $thankDiarySeqNo = $obj['thankDiarySeqNo'];
     $userSeqNo = $obj['userSeqNo'];
     $title = $obj['title'];
@@ -30,7 +23,7 @@ try {
                 echo '{"result":"success"}';
             }
             else {
-                echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "'.$commonError["message"].'"}';
+                echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
             }
         }
         else {
@@ -40,12 +33,12 @@ try {
                 echo '{"result":"success"}';
             }
             else {
-                echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "'.$commonError["message"].'"}';
+                echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
             }
         }
     }
     else {
-        echo '{"result":"fail", "errorCode": "02", "There are no user number."}';
+        echo '{"result":"fail", "errorCode": "02", "There is no user logged in."}';
     }
 
 }
