@@ -434,15 +434,14 @@ try {
             }
         }
 
-
-        if($goalResultStatus && $statusUpdateStatus && $biblePlanStatus && $customBibleStatus) {
-            echo '{"result":"success"}';
-        }
-        else {
-            echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
-        }
-
         
+    }
+
+    if($goalResultStatus && $statusUpdateStatus && $biblePlanStatus && $customBibleStatus) {
+        echo '{"result":"success"}';
+    }
+    else {
+        echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
     }
  
 
