@@ -104,7 +104,10 @@
             reading_bible as readingBible, 
             thank_diary as thankDiary, 
             qt_record as qtRecord, 
-            praying as praying 
+            praying as praying, 
+            bible_progress as bibleProgress,
+            bible_days as bibleDays,
+            goal_date as goalDate 
         from tbGoalProgress
         where user_seq_no = '$userSeqNo'
         and Date(goal_date) = '$goalDate';";
@@ -168,6 +171,27 @@
             return "Fail : ".$ex->getMessage()."<br>";
         }
 
+    }
+
+    function getLatestGoalProgress($userSeqNo) {
+        global $connection;
+        $query = "Select 
+            reading_bible as readingBible, 
+            thank_diary as thankDiary, 
+            qt_record as qtRecord, 
+            praying as praying, 
+            bible_progress as bibleProgress,
+            bible_days as bibleDays,
+            Date(goal_date) as goalDate
+        from tbGoalProgress
+        where user_seq_no = '$userSeqNo'
+        order by goal_progress_seq_no desc LIMIT 1;";
+        $result = mysqli_query($connection, $query);
+
+        if($result == false) {
+            echo "error: " . mysqli_error($connection);
+        }
+        return $result;
     }
 
 ?>

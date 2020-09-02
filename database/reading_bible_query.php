@@ -1,4 +1,56 @@
 <?php
+
+    function getBibleBooks($language) {
+        global $connection;
+        $query = "Select 
+            number,
+            (CASE WHEN '$language' = 'ko' THEN fullname_ko ELSE fullname_en END) as fullname,
+            short,
+            section,
+            chapters
+        from bibleBooks;";
+        $result = mysqli_query($connection, $query);
+
+        if($result == false) {
+            echo "error: " . mysqli_error($connection);
+        }
+        return $result;
+    }
+
+    function getBibleKJV($book, $chapter) {
+        global $connection;
+        $query = "Select 
+            book, 
+            chapter, 
+            verse, 
+            content 
+        from bible_kjv 
+        where book = (select number from bibleBooks where short = '$book') and chapter = '$chapter';";
+        $result = mysqli_query($connection, $query);
+
+        if($result == false) {
+            echo "error: " . mysqli_error($connection);
+        }
+        return $result;
+    }
+
+    function getBibleHRV($book, $chapter) {
+        global $connection;
+        $query = "Select 
+            book, 
+            chapter, 
+            verse, 
+            content 
+        from bible_korHRV 
+        where book = (select number from bibleBooks where short = '$book') and chapter = '$chapter';";
+        $result = mysqli_query($connection, $query);
+
+        if($result == false) {
+            echo "error: " . mysqli_error($connection);
+        }
+        return $result;
+    }
+
     function getBiblePlanList($language) {
         global $connection;
         $query = "Select 
@@ -173,5 +225,60 @@
 		}
 		return $result;
     }
+
+    function checkBibleSelected($userSeqNo) {
+        global $connection;
+        $query = "Select 
+            A.user_seq_no userSeqNo, 
+            B.user_bible_plan_seq_no userBiblePlanSeqNo,
+            IF(reading_bible, 'true', 'false') as readingBible, 
+            B.bible_plan_id biblePlanId
+        from (select * from tbGoal where user_seq_no = '" .$userSeqNo ."') as A
+        LEFT JOIN tbUserBiblePlan as B
+        ON A.user_seq_no = B.user_seq_no
+        and B.plan_status = 'P002_001'
+        and reading_bible = true;";
+        $result = mysqli_query($connection, $query);
+
+        if($result == false) {
+            echo "error: " . mysqli_error($connection);
+        }
+        return $result;
+    }
+
+    function getTodaysBible($biblePlanId, $days) {
+        global $connection;
+        $query = "Select 
+        days, chapter
+        from tbBiblePlanDetail
+        where  bible_plan_id = '$biblePlanId'
+        and days = '$days';";
+
+        $result = mysqli_query($connection, $query);
+
+        if($result == false) {
+            echo "error: " . mysqli_error($connection);
+        }
+        return $result;
+    }
+
+    function getTodaysBibleCustom($userSeqNo, $biblePlanId, $days) {
+        global $connection;
+        $query = "Select 
+        days, chapter
+        from tbUserBibleCustom
+        where  user_bible_plan_seq_no = (SELECT user_bible_plan_seq_no FROM tbUserBiblePlan 
+            WHERE user_seq_no = '$userSeqNo'
+            and plan_status = 'P002_001'
+            and bible_plan_id = '$biblePlanId')
+        and days = '$days';";
+        $result = mysqli_query($connection, $query);
+
+        if($result == false) {
+            echo "error: " . mysqli_error($connection);
+        }
+        return $result;
+    }
+
 
 ?>
