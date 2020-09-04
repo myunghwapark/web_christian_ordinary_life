@@ -34,22 +34,23 @@ try {
         }
         else {
 
-            $latestGoalInfo = getLatestGoalProgress($userSeqNo);
+            $latestGoalInfo = getLatestBibleGoalProgress($userSeqNo);
             $numLatestGoalInfo = mysqli_num_rows($latestGoalInfo);
             
             if($numLatestGoalInfo > 0) {
 
                 while($row = mysqli_fetch_array($latestGoalInfo)){
                     $bibleDays = $row['bibleDays'];
-                    //$latestGoalDate = $row['goalDate'];
                     $bibleProgress = $row['bibleProgress'];
+                    $readingBible = $row['readingBible'];
                 }
 
                 // $goalDate != $latestGoalDate && 
                 // When a user has finished reading the Bible for that day, let him read it for the next day.
                 // Date comparisons are not made so that the Bible can be read ahead.
                 if($readingBible == 'y') {
-                    $bibleDays = (int)$bibleDays++;
+                    $bibleDays = ((int)$bibleDays + 1);
+                    $bibleProgress = 0;
                 }
             }
             // Because there is no record of bible reading, it begins from start.

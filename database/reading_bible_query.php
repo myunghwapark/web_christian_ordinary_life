@@ -272,6 +272,7 @@
             and plan_status = 'P002_001'
             and bible_plan_id = '$biblePlanId')
         and days = '$days';";
+      
         $result = mysqli_query($connection, $query);
 
         if($result == false) {

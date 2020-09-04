@@ -10,9 +10,6 @@ try {
 	
     $userSeqNo = $obj['userSeqNo'];
     $goalDate = $obj['goalDate'];
-    $readingBible = $obj['readingBible'];
-    $thankDiary = $obj['thankDiary'];
-    $qtRecord = $obj['qtRecord'];
     $praying = $obj['praying'];
 
 
@@ -23,7 +20,7 @@ try {
 
 	if($numGetGoalResults > 0) {
 
-        $result = updateGoalProgress($userSeqNo, $goalDate, $readingBible, $thankDiary, $qtRecord, $praying) ;
+        $result = updatePrayingProgress($userSeqNo, $goalDate, $praying);
 
         if($result == 1) {
             echo '{"result":"success"}';
@@ -34,7 +31,7 @@ try {
     }
     else {
 
-        $result = setGoalProgress($userSeqNo, $goalDate, $readingBible, $thankDiary, $qtRecord, $praying);
+        $result = insertPrayingProgress($userSeqNo, $goalDate, $praying);
 
         if($result == 1) {
             echo '{"result":"success"}';
