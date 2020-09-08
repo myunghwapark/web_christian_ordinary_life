@@ -85,6 +85,25 @@
         return $result;
     }
 
+    function getBiblePlan($language, $biblePlanId) {
+        global $connection;
+        $query = "Select 
+            bible_plan_seq_no biblePlanSeqNo,
+            bible_plan_id biblePlanId, 
+            plan_period planPeriod, 
+            (CASE WHEN '$language' = 'ko' THEN plan_volume_ko ELSE plan_volume_en END) as planVolume,
+            (CASE WHEN '$language' = 'ko' THEN plan_title_ko ELSE plan_title_en END) as planTitle,
+            (CASE WHEN '$language' = 'ko' THEN plan_subtitle_ko ELSE plan_subtitle_en END) as planSubTitle
+        from tbBiblePlan 
+        where bible_plan_id = '$biblePlanId';";
+        $result = mysqli_query($connection, $query);
+
+        if($result == false) {
+            echo "error: " . mysqli_error($connection);
+        }
+        return $result;
+    }
+
     function getUserBiblePlanSeqNo($userSeqNo) {
         global $connection;
         $query = "Select 

@@ -16,6 +16,7 @@
                 praying_time prayingTime, 
                 praying_duration prayingDuration, 
                 goal_set_date goalSetDate,
+                Date(B.plan_start_date) biblePlanStartDate,
                 B.bible_plan_id biblePlanId,
                 B.custom_bible customBible,
                 B.plan_period planPeriod
