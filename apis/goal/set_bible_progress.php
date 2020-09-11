@@ -19,24 +19,35 @@ try {
     $userBiblePlanSeqNo = $obj['userBiblePlanSeqNo'];
 
 
-	$getGoalResult = getGoalProgress($userSeqNo, $goalDate);
-	$numGetGoalResults = mysqli_num_rows($getGoalResult);
+	$getBibleProgressResult = getBibleProgress($userSeqNo, $userBiblePlanSeqNo, $bibleDays);
+	$numBibleProgressResult = mysqli_num_rows($getBibleProgressResult);
 	
-    $result;
+    $bibleProgressResult;
 
-	if($numGetGoalResults > 0) {
+	if($numBibleProgressResult > 0) {
 
-        $result = updateBibleProgress($userSeqNo, $goalDate, $bibleProgress, $bibleProgressDone, $bibleDays, $userBiblePlanSeqNo);
+        $bibleProgressResult = updateBibleProgress($userSeqNo, $goalDate, $bibleProgress, $bibleProgressDone, $bibleDays, $userBiblePlanSeqNo);
 
     }
     else {
 
-        $result = insertBibleProgress($userSeqNo, $goalDate, $bibleProgress, $bibleProgressDone, $bibleDays, $userBiblePlanSeqNo);
+        $bibleProgressResult = insertBibleProgress($userSeqNo, $goalDate, $bibleProgress, $bibleProgressDone, $bibleDays, $userBiblePlanSeqNo);
 
     }
 
+    $result = 1;
     if($readingBible == 'y') {
-        $result = updateReadingBible($userSeqNo, $goalDate, $readingBible);
+
+        $getGoalResult = getGoalProgress($userSeqNo, $goalDate);
+        $numGetGoalResults = mysqli_num_rows($getGoalResult);
+    
+        if($numGetGoalResults > 0) {
+            $result = updateReadingBible($userSeqNo, $goalDate, $readingBible);
+        }
+        else {
+            $result = insertReadingBible($userSeqNo, $goalDate, $readingBible);
+        }
+
     }
 
     $statusUpdateResult = 1;
@@ -46,7 +57,7 @@ try {
         $statusUpdateResult = updateUserBiblePlanStatus($userSeqNo, 'P002_002', $userBiblePlanSeqNo);
     }
 
-    if($result == 1 && $statusUpdateResult == 1) {
+    if($bibleProgressResult == 1 && $result == 1 && $statusUpdateResult == 1) {
         echo '{"result":"success"}';
     }
     else {

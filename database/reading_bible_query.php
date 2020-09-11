@@ -148,27 +148,6 @@
 		}
 		return $result;
     }
-/* 
-	function updateUserBiblePlan($userSeqNo, $userBiblePlanSeqNo, $biblePlanId, $planPeriod, $customBible, $planEndDate, $biblePlanStatus) {
-		global $connection;
-        $query = "Update tbUserBiblePlan set
-            bible_plan_id='$biblePlanId',
-            plan_period='$planPeriod',
-            custom_bible='$customBible',
-            plan_start_date=NOW(),
-            plan_end_date='$planEndDate',
-            plan_status='$biblePlanStatus',
-            update_date=NOW()
-            where user_seq_no='$userSeqNo'
-            and user_bible_plan_seq_no='$userBiblePlanSeqNo';";
-        
-		$result = mysqli_query($connection, $query);
-
-		if($result == false) {
-			 echo "error: " . mysqli_error($connection);
-		}
-		return $result;
-    } */
 
 	function updateUserBiblePlanStatus($userSeqNo, $biblePlanStatus, $userBiblePlanSeqNo) {
 		global $connection;
@@ -335,19 +314,14 @@
         try {
             global $connection;
             $query = "Select 
-                reading_bible as readingBible, 
-                thank_diary as thankDiary, 
-                qt_record as qtRecord, 
-                praying as praying, 
                 bible_progress as bibleProgress,
                 bible_progress_done as bibleProgressDone,
                 bible_days as bibleDays,
                 Date(goal_date) as goalDate
-            from tbGoalProgress
+            from tbGoalBibleProgress
             where user_seq_no = '$userSeqNo'
             and user_bible_plan_seq_no = '$userBiblePlanSeqNo'
-            and bible_days IS NOT NULL
-            order by goal_progress_seq_no desc LIMIT 1;";
+            order by bible_days desc LIMIT 1;";
             
             $result = mysqli_query($connection, $query);
 
@@ -364,7 +338,7 @@
     function insertBibleProgress($userSeqNo, $goalDate, $bibleProgress, $bibleProgressDone, $bibleDays, $userBiblePlanSeqNo) {
         try {
             global $connection;
-            $query = "Insert into tbGoalProgress(user_seq_no,
+            $query = "Insert into tbGoalBibleProgress(user_seq_no,
                 user_bible_plan_seq_no,
                 bible_progress, 
                 bible_progress_done, 
@@ -397,14 +371,13 @@
         try {
             global $connection;
             $query = "Update 
-            tbGoalProgress set 
-                user_bible_plan_seq_no='$userBiblePlanSeqNo', 
+            tbGoalBibleProgress set 
                 bible_progress='$bibleProgress', 
                 bible_progress_done='$bibleProgressDone', 
-                bible_days='$bibleDays', 
                 update_date=NOW() 
             where user_seq_no='$userSeqNo'
-            and Date(goal_date)='$goalDate';";
+            and bible_days='$bibleDays'
+            and user_bible_plan_seq_no='$userBiblePlanSeqNo';";
 
 
             $result = mysqli_query($connection, $query);
@@ -418,6 +391,58 @@
             return "Fail : ".$ex->getMessage()."<br>";
         }
 
+    }
+
+    function getBibleProgress($userSeqNo, $userBiblePlanSeqNo, $bibleDays) {
+        try {
+            global $connection;
+            $query = "Select 
+                goal_date as goalDate, 
+                bible_progress as bibleProgress,
+                bible_days as bibleDays,
+                bible_progress_done as bibleProgressDone,
+                bible_days as bibleDays
+            from tbGoalBibleProgress
+            where bible_days = '$bibleDays'
+            and user_bible_plan_seq_no='$userBiblePlanSeqNo'
+            and user_seq_no = '$userSeqNo';";
+
+            $result = mysqli_query($connection, $query);
+
+            if($result == false) {
+                echo "error: " . mysqli_error($connection);
+            }
+            return $result;
+        }
+        catch(PDOException $ex) {
+            return "Fail : ".$ex->getMessage()."<br>";
+        }
+    }
+
+    function insertReadingBible($userSeqNo, $goalDate, $readingBible) {
+        try {
+            global $connection;
+            $query = "Insert into tbGoalProgress(user_seq_no,
+                reading_bible, 
+                goal_date,
+                create_date
+                ) 
+                values(
+                    '$userSeqNo', 
+                    '$readingBible',
+                    '$goalDate', 
+                    NOW());";
+            
+            $result = mysqli_query($connection, $query);
+
+            if($result == false) {
+                echo "error: " . mysqli_error($connection);
+            }
+            return $result;
+        }
+        catch(PDOException $ex) {
+            return "Fail : ".$ex->getMessage()."<br>";
+        }
     }
     
     function updateReadingBible($userSeqNo, $goalDate, $readingBible) {

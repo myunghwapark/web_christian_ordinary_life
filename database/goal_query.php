@@ -117,12 +117,16 @@
                 thank_diary as thankDiary, 
                 qt_record as qtRecord, 
                 praying as praying, 
+                A.goal_date as goalDate, 
                 bible_progress as bibleProgress,
                 bible_days as bibleDays,
-                goal_date as goalDate 
-            from tbGoalProgress
-            where user_seq_no = '$userSeqNo'
-            and Date(goal_date) = '$goalDate';";
+                bible_progress_done as bibleProgressDone,
+                bible_days as bibleDays
+            from (Select * from tbGoalProgress where Date(goal_date) = '$goalDate') A
+            LEFT JOIN tbGoalBibleProgress B
+            on A.user_seq_no = B.user_seq_no
+            and Date(A.goal_date) = Date(B.goal_date)
+            and A.user_seq_no = '$userSeqNo';";
 
             $result = mysqli_query($connection, $query);
 
@@ -344,6 +348,31 @@
             return "Fail : ".$ex->getMessage()."<br>";
         }
 
+    }
+
+    function getMonthGoalProgress($userSeqNo, $yearMonth) {
+        try {
+            global $connection;
+            $query = "Select 
+                reading_bible as readingBible, 
+                thank_diary as thankDiary, 
+                qt_record as qtRecord, 
+                praying as praying, 
+                goal_date as goalDate 
+            from tbGoalProgress
+            where DATE_FORMAT(goal_date, '%Y-%m') = '$yearMonth'
+            and user_seq_no = '$userSeqNo';";
+
+            $result = mysqli_query($connection, $query);
+
+            if($result == false) {
+                echo "error: " . mysqli_error($connection);
+            }
+            return $result;
+        }
+        catch(PDOException $ex) {
+            return "Fail : ".$ex->getMessage()."<br>";
+        }
     }
 
 ?>
