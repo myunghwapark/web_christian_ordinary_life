@@ -8,9 +8,19 @@ try {
     $obj = json_decode($json,true);
 	
     $thankDiarySeqNo = $obj['thankDiarySeqNo'];
+    $diaryDate = $obj['diaryDate'];
+	
+	$detailResult;
+	$deatilNumResults;
+	if($thankDiarySeqNo != null && $thankDiarySeqNo != '') {
+		$detailResult = getThankDiaryBySeqNo($thankDiarySeqNo);
+    	$deatilNumResults = mysqli_num_rows($detailResult);
+	}
+	else {
+		$detailResult = getThankDiaryByDiaryDate($diaryDate);
+    	$deatilNumResults = mysqli_num_rows($detailResult);
+	}
     
-    $detailResult = getThankDiary($thankDiarySeqNo);
-    $deatilNumResults = mysqli_num_rows($detailResult);
     
 	$counter = 0;
 	echo '{"result":"success", "detail": [';	

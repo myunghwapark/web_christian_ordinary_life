@@ -45,7 +45,22 @@ try {
             $result = updateReadingBible($userSeqNo, $goalDate, $readingBible);
         }
         else {
-            $result = insertReadingBible($userSeqNo, $goalDate, $readingBible);
+
+            $userGoalResult = getUserGoal($userSeqNo);
+            $numUserGoalResult = mysqli_num_rows($userGoalResult);    
+
+            $praying = "";
+            $thankDiary = "";
+            $qtRecord = "";
+            if($numUserGoalResult > 0) {
+                while($row = mysqli_fetch_array($userGoalResult)){
+                    $praying = $row['praying'] != 'true' ? '-' : 'n';
+                    $thankDiary = $row['thankDiary'] != 'true' ? '-' : 'n';
+                    $qtRecord = $row['qtRecord'] != 'true' ? '-' : 'n';
+                }
+            }
+
+            $result = setGoalProgress($userSeqNo, $goalDate, $readingBible, $thankDiary, $qtRecord, $praying);
         }
 
     }

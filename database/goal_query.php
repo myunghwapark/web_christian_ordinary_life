@@ -158,7 +158,7 @@
                     '$thankDiary', 
                     '$qtRecord', 
                     '$praying',  
-                    '$goalDate'', 
+                    '$goalDate', 
                     NOW());";
             
             $result = mysqli_query($connection, $query);

@@ -16,15 +16,52 @@ try {
     $content = $obj['content'];
     $thankDiary = $obj['thankDiary'];
     $goalDate = $obj['goalDate'];
+    $image = $obj['image'];
+    $imageURL = $obj['imageURL'];
+    $fileExtension = $obj['fileExtension'];
+    $categoryNo = $obj['categoryNo'];
+    $imageStatus = $obj['imageStatus'];
      
-
+    
+    $realImage;
     $setResult;
+    $fileName = '';
+    $success = true;
     if($userSeqNo != null && $userSeqNo != '') {
+        
+        
+        if($imageStatus == 'replace' || $imageStatus == 'delete') {
+            $saveFileName = $_SERVER['DOCUMENT_ROOT'] . '/col/images/diary/' . $imageURL;
+        
+            if(file_exists($saveFileName)) unlink($saveFileName);
+        }
+        else if($imageStatus == 'noChange') {
+            $fileName = $imageURL;
+        }
+
+        if($image != null) {
+
+            $date = date("YmdHis" ,time());
+            $fileNameStr = $thankDiarySeqNo . '_' . $userSeqNo. '_' . $date;
+            $saveFileName = $_SERVER['DOCUMENT_ROOT'] . '/col/images/diary/' . $fileNameStr;
+        
+            $fileName = $fileNameStr;
+
+            if($fileExtension != null && $fileExtension != '') {
+                $saveFileName = $saveFileName.'.'.$fileExtension;
+                $fileName = $fileName.'.'.$fileExtension;
+            }
+            if(file_exists($saveFileName)) unlink($saveFileName);
+            $realImage = base64_decode($image);
+            file_put_contents($saveFileName, $realImage);
+
+        } 
+
         if($thankDiarySeqNo == null || $thankDiarySeqNo == '') {
-            $setResult = insertThankDiary($userSeqNo, $title, $diaryDate, $content);
+            $setResult = insertThankDiary($userSeqNo, $title, $diaryDate, $content, $fileName, $categoryNo);
         }
         else {
-            $setResult = updateThankDiary($thankDiarySeqNo, $userSeqNo, $title, $diaryDate, $content);
+            $setResult = updateThankDiary($thankDiarySeqNo, $userSeqNo, $title, $diaryDate, $content, $fileName, $categoryNo);
         }
     }
     else {
@@ -32,7 +69,7 @@ try {
     }
 
 
-    if($setResult == 1) {
+    if($success && $setResult == 1) {
 
         $getGoalResult = getGoalProgress($userSeqNo, $goalDate);
         $numGetGoalResults = mysqli_num_rows($getGoalResult);
@@ -51,8 +88,23 @@ try {
             }
         }
         else {
+            
+            $userGoalResult = getUserGoal($userSeqNo);
+            $numUserGoalResult = mysqli_num_rows($userGoalResult);    
+
+            $praying = "";
+            $qtRecord = "";
+            $readingBible = "";
+            if($numUserGoalResult > 0) {
+                while($row = mysqli_fetch_array($userGoalResult)){
+                    $readingBible = $row['praying'] != 'true' ? '-' : 'n';
+                    $qtRecord = $row['qtRecord'] != 'true' ? '-' : 'n';
+                    $readingBible = $row['readingBible'] != 'true' ? '-' : 'n';
+                }
+            }
+
+            $result = setGoalProgress($userSeqNo, $goalDate, $readingBible, $thankDiary, $qtRecord, $praying);
     
-            $result = insertThankDiaryProgress($userSeqNo, $goalDate, $thankDiary);
     
             if($result == 1) {
                 echo '{"result":"success"}';

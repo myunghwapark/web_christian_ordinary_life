@@ -10,8 +10,14 @@ try {
 	
     $userSeqNo = $obj['userSeqNo'];
     $thankDiarySeqNo = $obj['thankDiarySeqNo'];
+    $imageURL = $obj['imageURL'];
 
     $result = deleteThankDiary($userSeqNo, $thankDiarySeqNo);
+
+	if($imageURL != null && $imageURL != '') {
+		$saveFileName = $_SERVER['DOCUMENT_ROOT'] . '/col/images/diary/' . $imageURL;
+		if(file_exists($saveFileName)) unlink($saveFileName);
+	}
 
     if($result == 1) {
         echo '{"result":"success"}';

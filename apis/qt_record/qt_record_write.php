@@ -51,8 +51,23 @@ try {
             }
         }
         else {
-    
-            $result = insertQtRecordProgress($userSeqNo, $goalDate, $qtRecord);
+            
+            $userGoalResult = getUserGoal($userSeqNo);
+            $numUserGoalResult = mysqli_num_rows($userGoalResult);    
+
+            $praying = "";
+            $thankDiary = "";
+            $readingBible = "";
+            if($numUserGoalResult > 0) {
+                while($row = mysqli_fetch_array($userGoalResult)){
+                    $praying = $row['praying'] != 'true' ? '-' : 'n';
+                    $thankDiary = $row['thankDiary'] != 'true' ? '-' : 'n';
+                    $readingBible = $row['readingBible'] != 'true' ? '-' : 'n';
+                }
+            }
+
+            $result = setGoalProgress($userSeqNo, $goalDate, $readingBible, $thankDiary, $qtRecord, $praying);
+
     
             if($result == 1) {
                 echo '{"result":"success"}';
