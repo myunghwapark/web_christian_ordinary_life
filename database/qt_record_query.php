@@ -1,8 +1,11 @@
 <?php
-    function getQtRecordList($userSeqNo, $searchKeyword, $startPageNum, $rowCount) {
+    function getQtRecordList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $startPageNum, $rowCount) {
         $searchQuery = "";
         if($searchKeyword != null && $searchKeyword != '') {
-            $searchQuery = " and title LIKE '%$searchKeyword%' or content LIKE '%$searchKeyword%' ";
+            $searchQuery = " and (title LIKE '%$searchKeyword%' or content LIKE '%$searchKeyword%') ";
+        }
+        if($searchStartDate != null && $searchStartDate != '') {
+            $searchQuery .= " and date(qt_date) between date('$searchStartDate') and date('$searchEndDate')";
         }
         global $connection;
         $query = "Select 

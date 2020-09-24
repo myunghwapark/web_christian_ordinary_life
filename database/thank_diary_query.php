@@ -1,8 +1,14 @@
 <?php
-    function getThankDiaryList($userSeqNo, $searchKeyword, $startPageNum, $rowCount) {
+    function getThankDiaryList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $categoryNo, $startPageNum, $rowCount) {
         $searchQuery = "";
         if($searchKeyword != null && $searchKeyword != '') {
-            $searchQuery = " and title LIKE '%$searchKeyword%' or content LIKE '%$searchKeyword%' ";
+            $searchQuery = " and (title LIKE '%$searchKeyword%' or content LIKE '%$searchKeyword%') ";
+        }
+        if($searchStartDate != null && $searchStartDate != '') {
+            $searchQuery .= " and date(diary_date) between date('$searchStartDate') and date('$searchEndDate')";
+        }
+        if($categoryNo != null && $categoryNo != '') {
+            $searchQuery .= " and thank_category_no = '$categoryNo'";
         }
         global $connection;
         $query = "Select 

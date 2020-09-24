@@ -9,10 +9,12 @@ try {
 	
     $userSeqNo = $obj['userSeqNo'];
     $searchKeyword = $obj['searchKeyword'];
+    $searchStartDate = $obj['searchStartDate'];
+    $searchEndDate = $obj['searchEndDate'];
     $startPageNum = $obj['startPageNum'];
     $rowCount = $obj['rowCount'];
 
-    $listResult = getQtRecordList($userSeqNo, $searchKeyword, $startPageNum, $rowCount);
+    $listResult = getQtRecordList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $startPageNum, $rowCount);
     
     $numResults = mysqli_num_rows($listResult);
     

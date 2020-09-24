@@ -9,10 +9,13 @@ try {
 	
     $userSeqNo = $obj['userSeqNo'];
     $searchKeyword = $obj['searchKeyword'];
+    $searchStartDate = $obj['searchStartDate'];
+    $searchEndDate = $obj['searchEndDate'];
+    $categoryNo = $obj['categoryNo'];
     $startPageNum = $obj['startPageNum'];
     $rowCount = $obj['rowCount'];
 
-    $listResult = getThankDiaryList($userSeqNo, $searchKeyword, $startPageNum, $rowCount);
+    $listResult = getThankDiaryList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $categoryNo, $startPageNum, $rowCount);
     
     $numResults = mysqli_num_rows($listResult);
     
