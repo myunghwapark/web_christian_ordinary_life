@@ -122,7 +122,7 @@
                 bible_days as bibleDays,
                 bible_progress_done as bibleProgressDone,
                 bible_days as bibleDays
-            from (Select * from tbGoalProgress where Date(goal_date) = '$goalDate') A
+            from (Select * from tbGoalProgress where Date(goal_date) = Date('$goalDate')) A
             LEFT JOIN tbGoalBibleProgress B
             on A.user_seq_no = B.user_seq_no
             and Date(A.goal_date) = Date(B.goal_date)
@@ -284,7 +284,7 @@
                 thank_diary='$thankDiary',
                 update_date=NOW() 
             where user_seq_no='$userSeqNo'
-            and Date(goal_date)='$goalDate';";
+            and Date(goal_date)=Date('$goalDate');";
 
 
             $result = mysqli_query($connection, $query);
@@ -334,7 +334,7 @@
                 qt_record='$qtRecord',
                 update_date=NOW() 
             where user_seq_no='$userSeqNo'
-            and Date(goal_date)='$goalDate';";
+            and Date(goal_date)=Date('$goalDate');";
 
 
             $result = mysqli_query($connection, $query);
