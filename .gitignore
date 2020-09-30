@@ -1,0 +1,6 @@
+apis/user/jwt.php
+database/database.php
+images/*
+
+# macOS
+.DS_Store

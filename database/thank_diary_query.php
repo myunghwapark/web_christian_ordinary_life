@@ -85,7 +85,7 @@
             thank_category_no categoryNo,
             (select thank_category_image_url from tbThankCategory where thank_category_no = A.thank_category_no) as categoryImageUrl 
             from tbThankDiary A 
-            where Date(diary_date) = '$diaryDate';";
+            where Date(diary_date) = Date('$diaryDate') order by create_date DESC LIMIT 1;";
             
         $result = mysqli_query($connection, $query);
 
@@ -96,9 +96,9 @@
     }
 
 
-	function insertThankDiary($userSeqNo, $title, $diaryDate, $content, $imageURL, $categoryNo) {
+	function insertThankDiary($thankDiarySeqNo, $userSeqNo, $title, $diaryDate, $content, $imageURL, $categoryNo) {
 		global $connection;
-        $query = "Insert into tbThankDiary(user_seq_no, title, diary_date, content, image_url, thank_category_no, create_date) values('$userSeqNo', '$title', '$diaryDate', '$content', '$imageURL', '$categoryNo', NOW());";
+        $query = "Insert into tbThankDiary(thank_diary_seq_no, user_seq_no, title, diary_date, content, image_url, thank_category_no, create_date) values('$thankDiarySeqNo', '$userSeqNo', '$title', '$diaryDate', '$content', '$imageURL', '$categoryNo', NOW());";
         
 		$result = mysqli_query($connection, $query);
 
@@ -151,6 +151,21 @@
             thank_category_image_url categoryImageUrl
         from tbThankCategory
         where active = 'y';";
+            
+        $result = mysqli_query($connection, $query);
+
+        if($result == false) {
+            echo "error: " . mysqli_error($connection);
+        }
+        return $result;
+    }
+    
+    function getThankDiaryNextSeqNo() {
+        
+        global $connection;
+        $query = "Select 
+            (MaX(thank_diary_seq_no) + 1) thankDiarySeqNo 
+        FROM tbThankDiary;";
             
         $result = mysqli_query($connection, $query);
 

@@ -8,9 +8,19 @@ try {
     $obj = json_decode($json,true);
 	
     $qtRecordSeqNo = $obj['qtRecordSeqNo'];
+    $qtDate = $obj['qtDate'];
     
-    $detailResult = getQtRecord($qtRecordSeqNo);
-    $deatilNumResults = mysqli_num_rows($detailResult);
+	
+	$detailResult;
+	$deatilNumResults;
+	if($qtRecordSeqNo != null && $qtRecordSeqNo != '') {
+		$detailResult = getQtRecordBySeqNo($qtRecordSeqNo);
+		$deatilNumResults = mysqli_num_rows($detailResult);
+	}
+	else {
+		$detailResult = getQtRecordByQtDate($qtDate);
+		$deatilNumResults = mysqli_num_rows($detailResult);
+	}
     
 	$counter = 0;
 	echo '{"result":"success", "detail": [';	

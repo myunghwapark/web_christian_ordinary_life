@@ -46,7 +46,7 @@
     }
 
 
-    function getQtRecord($qtRecordSeqNo) {
+    function getQtRecordBySeqNo($qtRecordSeqNo) {
         global $connection;
         $query = "Select 
             qt_record_seq_no seqNo, 
@@ -57,6 +57,26 @@
             create_date 
             from tbQtRecord 
             where qt_record_seq_no = '$qtRecordSeqNo';";
+            
+        $result = mysqli_query($connection, $query);
+
+        if($result == false) {
+            echo "error: " . mysqli_error($connection);
+        }
+        return $result;
+    }
+
+    function getQtRecordByQtDate($qtDate) {
+        global $connection;
+        $query = "Select 
+            qt_record_seq_no seqNo, 
+            title, 
+            qt_date qtDate, 
+            bible,
+            content,
+            create_date 
+            from tbQtRecord 
+            where Date(qt_date) = Date('$qtDate') LIMIT 1;";
             
         $result = mysqli_query($connection, $query);
 

@@ -27,7 +27,13 @@ try {
     $setResult;
     $fileName = '';
     $success = true;
+    $newDiary = false;
+
     if($userSeqNo != null && $userSeqNo != '') {
+
+        if($thankDiarySeqNo == null || $thankDiarySeqNo == '') {
+            $newDiary = true;
+        }
         
         
         if($imageStatus == 'replace' || $imageStatus == 'delete') {
@@ -37,6 +43,15 @@ try {
         }
         else if($imageStatus == 'noChange') {
             $fileName = $imageURL;
+        }
+
+        if($newDiary) {
+
+            $thankDiarySeqNoResult = getThankDiaryNextSeqNo();
+            $numThankDiarySeqNoResult = mysqli_num_rows($thankDiarySeqNoResult);
+            while($row = mysqli_fetch_array($thankDiarySeqNoResult)){
+                $thankDiarySeqNo = $row['thankDiarySeqNo'];
+            }
         }
 
         if($image != null) {
@@ -57,8 +72,8 @@ try {
 
         } 
 
-        if($thankDiarySeqNo == null || $thankDiarySeqNo == '') {
-            $setResult = insertThankDiary($userSeqNo, $title, $diaryDate, $content, $fileName, $categoryNo);
+        if($newDiary) {
+            $setResult = insertThankDiary($thankDiarySeqNo, $userSeqNo, $title, $diaryDate, $content, $fileName, $categoryNo);
         }
         else {
             $setResult = updateThankDiary($thankDiarySeqNo, $userSeqNo, $title, $diaryDate, $content, $fileName, $categoryNo);
