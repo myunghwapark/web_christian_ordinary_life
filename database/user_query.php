@@ -58,11 +58,26 @@
 		return mysqli_num_rows($result);
     }
     
-	function updateUserPassword($userSeqNo, $userPassword) {
+	function getUserNameByEmail($userEmail) {
+		global $connection;
+		$query = "Select 
+			user_name userName 
+			from tbUser 
+			where user_email = '$userEmail';";
+
+		$result = mysqli_query($connection, $query);
+
+		if($result == false) {
+			 echo "error: " . mysqli_error($connection);
+		}
+		return $result;
+    }
+    
+	function updateUserPassword($userEmail, $userPassword) {
 		global $connection;
 		$query = "Update tbUser set 
-			user_password='SHA1(UNHEX(SHA1('$userPassword'))), update_date=NOW() 
-			where user_seq_no='$userSeqNo';";
+			user_password=SHA1(UNHEX(SHA1('$userPassword'))), update_date=NOW() 
+			where user_email='$userEmail';";
 
 		$result = mysqli_query($connection, $query);
 

@@ -109,6 +109,23 @@
 
     }
 
+	function deleteUserGoal($userSeqNo) {
+        try {
+            global $connection;
+            $query = "Delete from tbGoal where user_seq_no='$userSeqNo';";
+
+            $result = mysqli_query($connection, $query);
+
+            if($result == false) {
+                echo "error: " . mysqli_error($connection);
+            }
+            return $result;
+        }
+        catch(PDOException $ex) {
+            return "Fail : ".$ex->getMessage()."<br>";
+        }
+    }
+
     function getGoalProgress($userSeqNo, $goalDate) {
         try {
             global $connection;

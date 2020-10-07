@@ -165,6 +165,21 @@
 		return $result;
     }
 
+	function updateAllUserBiblePlanStatus($userSeqNo, $biblePlanStatus) {
+		global $connection;
+        $query = "Update tbUserBiblePlan set
+            plan_status='$biblePlanStatus',
+            update_date=NOW()
+            where user_seq_no='$userSeqNo';";
+        
+		$result = mysqli_query($connection, $query);
+
+		if($result == false) {
+			 echo "error: " . mysqli_error($connection);
+		}
+		return $result;
+    }
+
     function getCurrentBiblePlanSeqNo() {
         global $connection;
         $query = "Select 
