@@ -29,12 +29,12 @@ try {
             }
         }
         else {
-            echo '{"result":"fail", "errorCode": "02", "There is no goal set."}';
+            echo '{"result":"fail", "errorCode": "02", "errorMessage": "There is no goal set."}';
         }
         
     }
     else {
-        echo '{"result":"fail", "errorCode": "01", "There is no user logged in."}';
+        echo '{"result":"fail", "errorCode": "01",  "errorMessage": "There is no user logged in."}';
     }
 
 }

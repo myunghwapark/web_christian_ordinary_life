@@ -139,11 +139,10 @@
                 bible_days as bibleDays,
                 bible_progress_done as bibleProgressDone,
                 bible_days as bibleDays
-            from (Select * from tbGoalProgress where Date(goal_date) = Date('$goalDate')) A
+            from (Select * from tbGoalProgress where user_seq_no = '$userSeqNo' and Date(goal_date) = Date('$goalDate')) A
             LEFT JOIN tbGoalBibleProgress B
             on A.user_seq_no = B.user_seq_no
-            and Date(A.goal_date) = Date(B.goal_date)
-            and A.user_seq_no = '$userSeqNo';";
+            and Date(A.goal_date) = Date(B.goal_date);";
 
             $result = mysqli_query($connection, $query);
 
