@@ -21,6 +21,9 @@ try {
             $biblePlanStatus = 'P002_003'; //Cancel
             $updateBiblePlanResult = updateAllUserBiblePlanStatus($userSeqNo, $biblePlanStatus);
 
+
+            insertUserGoalHistory($userSeqNo, null, null, null, null, null, null, null, null, null, null);
+
             if($deleteUserGoalResult == 1 && $updateBiblePlanResult == 1) {
                 echo '{"result":"success"}';
             }

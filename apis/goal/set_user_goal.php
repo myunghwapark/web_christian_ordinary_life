@@ -92,6 +92,8 @@ try {
         } 
     }
 
+    insertUserGoalHistory($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration, $biblePlanId);
+
     $getBiblePlanResult = getUserBiblePlanSeqNo($userSeqNo);
     $biblePlanResultCnt = mysqli_num_rows($getBiblePlanResult);
     

@@ -1,5 +1,5 @@
 <?php
-$launguage = $_GET["launguage"];
+$language = $_GET["language"];
 
 ?>
 
@@ -14,7 +14,7 @@ $launguage = $_GET["launguage"];
     <body>
       <?php
 
-      if($launguage == 'ko') {
+      if($language == 'ko') {
         include_once 'privacy_policy_ko.html';
       }
       else {
