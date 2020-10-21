@@ -1,16 +1,9 @@
 <?php
+require_once $_SERVER["DOCUMENT_ROOT"].'/col/common/header.php';
+require('../../database/goal_query.php');
+require('../../database/reading_bible_query.php');
 
 try {
-	require('../../database/database.php');
-	require('../../database/goal_query.php');
-	require('../../database/reading_bible_query.php');
-    require('../../common/error_message.php');
-
-    // Getting the received JSON into $json variable.
-    $json = file_get_contents('php://input');
- 
-    // Decoding the received JSON and store into $obj variable.
-    $obj = json_decode($json,true);
 
 /* 
     $userSeqNo = '3';
@@ -33,6 +26,7 @@ try {
     //$customBible = '[{ "book": "gal", "volume":"6" }, { "book": "jonah", "volume":"4" }, { "book": "dan", "volume":"12" }, { "book": "isa", "volume":"66" }, { "book": "acts", "volume":"28" }, { "book": "james", "volume":"5" }, { "book": "1john", "volume":"5" }, { "book": "2john", "volume":"1" }, { "book": "3john", "volume":"1" }]';
     $planEndDate = '2020-08-25 00:00:00';
   */
+    $jwtCls = new Jwt();
      
     $userSeqNo = $obj['userSeqNo'];
     $readingBible = $obj['readingBible'];
@@ -49,345 +43,297 @@ try {
     $planPeriod = $obj['planPeriod'];
     $customBible = $obj['customBible'];
     $planEndDate = $obj['planEndDate']; 
- 
-    //echo 'customBible: '.$customBible;
-    //echo 'planPeriod: '.$planPeriod;
+    $keepLogin = $obj['keepLogin'];
+    $jwt = $obj['jwt'];
 
-
-	$getGoalResult = getUserGoal($userSeqNo);
-	$goalResultCnt = mysqli_num_rows($getGoalResult);
-	
-    $counter = 0;
-    $setGoalResult;
-    $setBiblePlanResult;
-
-    // To return the results to the app
-    $goalResultStatus = true;
-    $statusUpdateStatus = true;
-    $biblePlanStatus = true;
-    $customBibleStatus = true;
-
-    // Goal setting (If there is goal for the user, insert otherwise update.)
-	if($goalResultCnt == 0) {
-
-        $setGoalResult = setUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration);
- 
-        if($setGoalResult == 1) {
-            $goalResultStatus = true;
-        }
-        else {
-            $goalResultErrorMessage = '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
-            $goalResultStatus = false;
-        } 
-    }
-    else {
-        $setGoalResult = updateUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration);
-
- 
-        if($setGoalResult == 1) {
-            $goalResultStatus = true;
-        }
-        else {
-            $goalResultStatus = false;
-        } 
-    }
-
-    insertUserGoalHistory($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration, $biblePlanId);
-
-    $getBiblePlanResult = getUserBiblePlanSeqNo($userSeqNo);
-    $biblePlanResultCnt = mysqli_num_rows($getBiblePlanResult);
+    $auch = $jwtCls->dehashing($jwt);
     
-    // Case of when there is a old bible plan
-    if($biblePlanResultCnt != 0) {
-        // update needed
-        $userBiblePlanSeqNo = "";
-        while($row = mysqli_fetch_array($getBiblePlanResult)){
-            $userBiblePlanSeqNo = $row['userBiblePlanSeqNo'];
-        }
-    
-        $oldBiblePlanStatus = 'P002_003'; // Cancel
-        $statusUpdateResult = updateUserBiblePlanStatus($userSeqNo, $oldBiblePlanStatus, $userBiblePlanSeqNo);
-        if($statusUpdateResult == 1) {
-            $statusUpdateStatus = true;
-        }
-        else {
-            $statusUpdateStatus = false;
-        }
-    }
-
-    // Case of when user set reading bible
-    if($readingBible == true || $readingBible == 'true') {
-
-        $setBiblePlanResult = setUserBiblePlan($userSeqNo, $biblePlanId, $planPeriod, $customBible, $planEndDate);
- 
-        if($setBiblePlanResult == 1) {
-            $biblePlanStatus = true;
-        }
-        else {
-            $biblePlanStatus = false;
-        } 
-
-    }
-        
-    
-    if(($readingBible == true || $readingBible == 'true') && $biblePlanId == 'custom') {
-
-        $newBiblePlanSeqNo = '';
-        $newBiblePlanResult = getUserBiblePlanSeqNo($userSeqNo);
-        while($row = mysqli_fetch_array($newBiblePlanResult)){
-            $newBiblePlanSeqNo = $row['userBiblePlanSeqNo'];
-        }
-
-        $totalVolume = 0;
-        $chapterForDay = 0;
-        $planPeriod = (int)$planPeriod;
-        $chapterLeft = 0;
-
-        $customBibleList = json_decode($customBible, true);
-        foreach ($customBibleList as $key => $value) {
-            $totalVolume += (int)$value["volume"];
-        
-        }
-        $chapterForDay = ($totalVolume - ($totalVolume % $planPeriod)) / $planPeriod; 
-        $chapterLeft = $totalVolume % $planPeriod;
-        //echo 'totalVolume: '.$totalVolume;
-        //echo 'chapterForDay: '.$chapterForDay;
-        //echo 'chapterLeft: '.$chapterLeft;
-
-        $startVolume = 1;
-        $nextVolume = 0;
-        $daysArray = new SplFixedArray($planPeriod);
-        $arrayIndex = 0;
-
-        $leftChapter = '';
-        $leftChapterStart = 0;
-        $volumeLeft = 0;    // 하루 읽을 분량을 읽고 남은 챕터
-        $str = '';
-        $last = false;
-        $duplicateCheck = false;
-        
-
-        function getArrayLast() {
-            global $arrayIndex, $planPeriod;
-            if($arrayIndex == ($planPeriod - 1)) return true;
-            else return false;
-        }
-
-
-        function getVolume($startVolume, $nextVolume) {
-            if($nextVolume != 1)
-                $nextVolume--;
-
-            $vStr = $startVolume.'-'.$nextVolume;
-            if($startVolume == $nextVolume) $vStr = $startVolume;
-            return $vStr;
-        }
-
-        // 남은 날은 첫번째 날부터 한장씩 추가해서 읽는다.
-        function addChapterLeft($nextVolume) {
-            global $chapterLeft, $duplicateCheck;
-            if($chapterLeft != 0 && !$duplicateCheck) {
-                $nextVolume++;
-                $chapterLeft--;
-                $duplicateCheck = true;
-            }
-            return $nextVolume;
-        }
-
-        function checkChapterLeft($nextVolume) {
-            global $chapterLeft, $duplicateCheck;
-            if($chapterLeft != 0 && !$duplicateCheck) {
-                $nextVolume++;
-            }
-            return $nextVolume;
-        }
-
-        foreach ($customBibleList as $key => $value) {
-            $curChapter = $value["book"];
-            $curVolume = (int)$value["volume"];
-
-            if( !next( $customBibleList ) )
-                $last = true;
-            else $last = false;
+    if($auch) {
             
-            if($volumeLeft == 0) {
-                //echo ' #1 ';
-                $startVolume = 1;
+        $jwt = $jwtCls->hashing($userSeqNo, $keepLogin);
+ 
+        //echo 'customBible: '.$customBible;
+        //echo 'planPeriod: '.$planPeriod;
 
-                if($curVolume == checkChapterLeft($chapterForDay)) { 
-                    $nextVolume = $startVolume + $curVolume;
-                    
-                    $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}]';
-                    
-                    //echo ' #1-1 '.$str.' ';
-                    $daysArray[$arrayIndex] = $str;
-                    $arrayIndex++;
-                    $volumeLeft = 0;
-                    $duplicateCheck = false;
-                    if($chapterLeft != 0) $chapterLeft--;
+
+        $getGoalResult = getUserGoal($userSeqNo);
+        $goalResultCnt = mysqli_num_rows($getGoalResult);
+        
+        $counter = 0;
+        $setGoalResult;
+        $setBiblePlanResult;
+
+        // To return the results to the app
+        $goalResultStatus = true;
+        $statusUpdateStatus = true;
+        $biblePlanStatus = true;
+        $customBibleStatus = true;
+
+        // Goal setting (If there is goal for the user, insert otherwise update.)
+        if($goalResultCnt == 0) {
+
+            $setGoalResult = setUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration);
+    
+            if($setGoalResult == 1) {
+                $goalResultStatus = true;
+            }
+            else {
+                $goalResultErrorMessage = '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
+                $goalResultStatus = false;
+            } 
+        }
+        else {
+            $setGoalResult = updateUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration);
+
+    
+            if($setGoalResult == 1) {
+                $goalResultStatus = true;
+            }
+            else {
+                $goalResultStatus = false;
+            } 
+        }
+
+        insertUserGoalHistory($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration, $biblePlanId);
+
+        $getBiblePlanResult = getUserBiblePlanSeqNo($userSeqNo);
+        $biblePlanResultCnt = mysqli_num_rows($getBiblePlanResult);
+        
+        // Case of when there is a old bible plan
+        if($biblePlanResultCnt != 0) {
+            // update needed
+            $userBiblePlanSeqNo = "";
+            while($row = mysqli_fetch_array($getBiblePlanResult)){
+                $userBiblePlanSeqNo = $row['userBiblePlanSeqNo'];
+            }
+        
+            $oldBiblePlanStatus = 'P002_003'; // Cancel
+            $statusUpdateResult = updateUserBiblePlanStatus($userSeqNo, $oldBiblePlanStatus, $userBiblePlanSeqNo);
+            if($statusUpdateResult == 1) {
+                $statusUpdateStatus = true;
+            }
+            else {
+                $statusUpdateStatus = false;
+            }
+        }
+
+        // Case of when user set reading bible
+        if($readingBible == true || $readingBible == 'true') {
+
+            $setBiblePlanResult = setUserBiblePlan($userSeqNo, $biblePlanId, $planPeriod, $customBible, $planEndDate);
+    
+            if($setBiblePlanResult == 1) {
+                $biblePlanStatus = true;
+            }
+            else {
+                $biblePlanStatus = false;
+            } 
+
+        }
+            
+        
+        if(($readingBible == true || $readingBible == 'true') && $biblePlanId == 'custom') {
+
+            $newBiblePlanSeqNo = '';
+            $newBiblePlanResult = getUserBiblePlanSeqNo($userSeqNo);
+            while($row = mysqli_fetch_array($newBiblePlanResult)){
+                $newBiblePlanSeqNo = $row['userBiblePlanSeqNo'];
+            }
+
+            $totalVolume = 0;
+            $chapterForDay = 0;
+            $planPeriod = (int)$planPeriod;
+            $chapterLeft = 0;
+
+            $customBibleList = json_decode($customBible, true);
+            foreach ($customBibleList as $key => $value) {
+                $totalVolume += (int)$value["volume"];
+            
+            }
+            $chapterForDay = ($totalVolume - ($totalVolume % $planPeriod)) / $planPeriod; 
+            $chapterLeft = $totalVolume % $planPeriod;
+            //echo 'totalVolume: '.$totalVolume;
+            //echo 'chapterForDay: '.$chapterForDay;
+            //echo 'chapterLeft: '.$chapterLeft;
+
+            $startVolume = 1;
+            $nextVolume = 0;
+            $daysArray = new SplFixedArray($planPeriod);
+            $arrayIndex = 0;
+
+            $leftChapter = '';
+            $leftChapterStart = 0;
+            $volumeLeft = 0;    // 하루 읽을 분량을 읽고 남은 챕터
+            $str = '';
+            $last = false;
+            $duplicateCheck = false;
+            
+
+            function getArrayLast() {
+                global $arrayIndex, $planPeriod;
+                if($arrayIndex == ($planPeriod - 1)) return true;
+                else return false;
+            }
+
+
+            function getVolume($startVolume, $nextVolume) {
+                if($nextVolume != 1)
+                    $nextVolume--;
+
+                $vStr = $startVolume.'-'.$nextVolume;
+                if($startVolume == $nextVolume) $vStr = $startVolume;
+                return $vStr;
+            }
+
+            // 남은 날은 첫번째 날부터 한장씩 추가해서 읽는다.
+            function addChapterLeft($nextVolume) {
+                global $chapterLeft, $duplicateCheck;
+                if($chapterLeft != 0 && !$duplicateCheck) {
+                    $nextVolume++;
+                    $chapterLeft--;
+                    $duplicateCheck = true;
                 }
-                else if($curVolume > checkChapterLeft($chapterForDay)) {
+                return $nextVolume;
+            }
 
-                    $remainVolume = $curVolume;
+            function checkChapterLeft($nextVolume) {
+                global $chapterLeft, $duplicateCheck;
+                if($chapterLeft != 0 && !$duplicateCheck) {
+                    $nextVolume++;
+                }
+                return $nextVolume;
+            }
 
-                    while($chapterLeft != 0 && $remainVolume >= checkChapterLeft($chapterForDay)) {
+            foreach ($customBibleList as $key => $value) {
+                $curChapter = $value["book"];
+                $curVolume = (int)$value["volume"];
 
-                        $addVolume = addChapterLeft($chapterForDay);
-                        $nextVolume = $startVolume + $addVolume;
+                if( !next( $customBibleList ) )
+                    $last = true;
+                else $last = false;
+                
+                if($volumeLeft == 0) {
+                    //echo ' #1 ';
+                    $startVolume = 1;
+
+                    if($curVolume == checkChapterLeft($chapterForDay)) { 
+                        $nextVolume = $startVolume + $curVolume;
                         
                         $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}]';
-                        //echo ' #1-3 '.$str.' ';
+                        
+                        //echo ' #1-1 '.$str.' ';
                         $daysArray[$arrayIndex] = $str;
                         $arrayIndex++;
-                        $startVolume = $nextVolume;
+                        $volumeLeft = 0;
                         $duplicateCheck = false;
-
-                        $remainVolume -= $addVolume;
+                        if($chapterLeft != 0) $chapterLeft--;
                     }
-                    
+                    else if($curVolume > checkChapterLeft($chapterForDay)) {
 
-                    if($remainVolume != 0) {
-                        $volume = ($remainVolume - ($remainVolume % $chapterForDay)) / $chapterForDay; 
+                        $remainVolume = $curVolume;
 
-                        // 남는 거 마지막에 추가
-                        $volumeLeft = $remainVolume % $chapterForDay;
-        
-                        for($i=0;$i<$volume;$i++) {
-                            $nextVolume = $startVolume + $chapterForDay;
+                        while($chapterLeft != 0 && $remainVolume >= checkChapterLeft($chapterForDay)) {
+
+                            $addVolume = addChapterLeft($chapterForDay);
+                            $nextVolume = $startVolume + $addVolume;
                             
                             $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}]';
+                            //echo ' #1-3 '.$str.' ';
                             $daysArray[$arrayIndex] = $str;
                             $arrayIndex++;
                             $startVolume = $nextVolume;
                             $duplicateCheck = false;
-                            //echo ' #1-4 '.$str.' ';
+
+                            $remainVolume -= $addVolume;
                         }
-                        $leftChapterStart = $nextVolume;
-    
-                        if($volumeLeft != 0) {
-                            $nextVolume = ($leftChapterStart + $volumeLeft);
-    
-                            $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($leftChapterStart, $nextVolume).'"}';
-                            if(getArrayLast()) {
-                                $str .= ']';
+                        
+
+                        if($remainVolume != 0) {
+                            $volume = ($remainVolume - ($remainVolume % $chapterForDay)) / $chapterForDay; 
+
+                            // 남는 거 마지막에 추가
+                            $volumeLeft = $remainVolume % $chapterForDay;
+            
+                            for($i=0;$i<$volume;$i++) {
+                                $nextVolume = $startVolume + $chapterForDay;
+                                
+                                $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}]';
                                 $daysArray[$arrayIndex] = $str;
+                                $arrayIndex++;
+                                $startVolume = $nextVolume;
                                 $duplicateCheck = false;
+                                //echo ' #1-4 '.$str.' ';
                             }
-                            $volumeLeft = ($chapterForDay - $volumeLeft);
-                            //echo ' #1-5 '.$str.' ';
+                            $leftChapterStart = $nextVolume;
+        
+                            if($volumeLeft != 0) {
+                                $nextVolume = ($leftChapterStart + $volumeLeft);
+        
+                                $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($leftChapterStart, $nextVolume).'"}';
+                                if(getArrayLast()) {
+                                    $str .= ']';
+                                    $daysArray[$arrayIndex] = $str;
+                                    $duplicateCheck = false;
+                                }
+                                $volumeLeft = ($chapterForDay - $volumeLeft);
+                                //echo ' #1-5 '.$str.' ';
+                            }
                         }
+                        
+
                     }
-                    
+                    else if($curVolume < checkChapterLeft($chapterForDay)) {
+                        $nextVolume = $startVolume + $curVolume;
 
-                }
-                else if($curVolume < checkChapterLeft($chapterForDay)) {
-                    $nextVolume = $startVolume + $curVolume;
+                        $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}';
+                        $leftChapterStart = ($curVolume + 1);
+                        $volumeLeft = (checkChapterLeft($chapterForDay) - $curVolume);
+                        if($chapterLeft != 0 && !$duplicateCheck) {
+                            $duplicateCheck = true;
+                            $chapterLeft--;
+                        }
 
-                    $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}';
-                    $leftChapterStart = ($curVolume + 1);
-                    $volumeLeft = (checkChapterLeft($chapterForDay) - $curVolume);
-                    if($chapterLeft != 0 && !$duplicateCheck) {
-                        $duplicateCheck = true;
-                        $chapterLeft--;
-                    }
-
-                    if(getArrayLast()) {
-                        $str .= ']';
-                        $daysArray[$arrayIndex] = $str;
-                        $duplicateCheck = false;
-                    }
-                    //echo ' #1-6 '.$str.' ';
-                }
-            }
-            else {
-
-                //echo ' #2 ';
-                $startVolume = 1;
-
-                if($curVolume == checkChapterLeft($volumeLeft)) {
-                    $addVolume = addChapterLeft($volumeLeft);
-                    $nextVolume = $startVolume + $addVolume;
-
-                    $str .= ', {"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}]';
-                    $daysArray[$arrayIndex] = $str;
-                    $arrayIndex++;
-                    $volumeLeft = 0;
-                    $duplicateCheck = false;
-                    //echo ' #2-1 '.$str;
-                }
-                else if($curVolume > checkChapterLeft($volumeLeft)) {
-                    $addVolume = addChapterLeft($volumeLeft);
-                    $nextVolume = $startVolume + $addVolume;
-
-                    $str .= ', {"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}]';
-                    $daysArray[$arrayIndex] = $str;
-                    $arrayIndex++;
-                    $duplicateCheck = false;
-                    //echo ' #2-2 '.$str;
-
-                    // 그래도 남는 것들 처리
-                    $remainVolume = $curVolume - $addVolume;
-
-                    $leftChapterStart = $nextVolume;
-                    if($remainVolume == 0) {}
-                    else if($remainVolume < checkChapterLeft($chapterForDay)) {
-                        $nextVolume = ($leftChapterStart + $remainVolume);
-
-                        $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($leftChapterStart, $nextVolume).'"}';
                         if(getArrayLast()) {
                             $str .= ']';
                             $daysArray[$arrayIndex] = $str;
                             $duplicateCheck = false;
                         }
-                        $volumeLeft = checkChapterLeft($chapterForDay) - $remainVolume;
-                        if($chapterLeft != 0 && !$duplicateCheck) {
-                            $duplicateCheck = true;
-                            $chapterLeft--;
-                        }
-                        //echo ' #2-3 '.$str.' ';
+                        //echo ' #1-6 '.$str.' ';
                     }
-                    else {
+                }
+                else {
 
+                    //echo ' #2 ';
+                    $startVolume = 1;
 
-                        while($chapterLeft != 0 && $remainVolume >= checkChapterLeft($chapterForDay)) {
-                            $addVolume = addChapterLeft($chapterForDay);
-                            $nextVolume = $leftChapterStart + $addVolume;
-                            
-                            $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($leftChapterStart, $nextVolume).'"}]';
-                            $daysArray[$arrayIndex] = $str;
-                            $arrayIndex++;
-                            $leftChapterStart = $nextVolume;
-                            $duplicateCheck = false;
+                    if($curVolume == checkChapterLeft($volumeLeft)) {
+                        $addVolume = addChapterLeft($volumeLeft);
+                        $nextVolume = $startVolume + $addVolume;
 
-                            $remainVolume = ($remainVolume - $addVolume);
-                            //echo ' #2-4 '.$str.' ';
-                        }
-                        
-                        
-                        $volume = ($remainVolume - ($remainVolume % $chapterForDay)) / $chapterForDay; 
-                        
-                        // for문 다음에 추가
-                        $volumeLeft = $remainVolume % $chapterForDay;
+                        $str .= ', {"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}]';
+                        $daysArray[$arrayIndex] = $str;
+                        $arrayIndex++;
+                        $volumeLeft = 0;
+                        $duplicateCheck = false;
+                        //echo ' #2-1 '.$str;
+                    }
+                    else if($curVolume > checkChapterLeft($volumeLeft)) {
+                        $addVolume = addChapterLeft($volumeLeft);
+                        $nextVolume = $startVolume + $addVolume;
 
-                        for($i=0;$i<$volume;$i++) {
-                            $nextVolume = ($leftChapterStart + $chapterForDay);
-                            
-                            $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($leftChapterStart, $nextVolume).'"}';
+                        $str .= ', {"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}]';
+                        $daysArray[$arrayIndex] = $str;
+                        $arrayIndex++;
+                        $duplicateCheck = false;
+                        //echo ' #2-2 '.$str;
 
-                            if(!getArrayLast() || (getArrayLast() && $last)) {
-                                $str .= ']';
-                                $daysArray[$arrayIndex] = $str;
-                                $arrayIndex++;
-                                $duplicateCheck = false;
-                            } 
-                            
-                            $leftChapterStart = $nextVolume;
-                            //echo ' #2-5 '.$str.' ';
-                        }
+                        // 그래도 남는 것들 처리
+                        $remainVolume = $curVolume - $addVolume;
+
                         $leftChapterStart = $nextVolume;
-    
-                        if(!getArrayLast() && $volumeLeft != 0) {
-                            $nextVolume = ($leftChapterStart + $volumeLeft);
+                        if($remainVolume == 0) {}
+                        else if($remainVolume < checkChapterLeft($chapterForDay)) {
+                            $nextVolume = ($leftChapterStart + $remainVolume);
 
                             $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($leftChapterStart, $nextVolume).'"}';
                             if(getArrayLast()) {
@@ -395,55 +341,113 @@ try {
                                 $daysArray[$arrayIndex] = $str;
                                 $duplicateCheck = false;
                             }
-                            $volumeLeft = $chapterForDay - $volumeLeft;
-                            //echo ' #2-6 '.$str.' ';
+                            $volumeLeft = checkChapterLeft($chapterForDay) - $remainVolume;
+                            if($chapterLeft != 0 && !$duplicateCheck) {
+                                $duplicateCheck = true;
+                                $chapterLeft--;
+                            }
+                            //echo ' #2-3 '.$str.' ';
                         }
+                        else {
+
+
+                            while($chapterLeft != 0 && $remainVolume >= checkChapterLeft($chapterForDay)) {
+                                $addVolume = addChapterLeft($chapterForDay);
+                                $nextVolume = $leftChapterStart + $addVolume;
+                                
+                                $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($leftChapterStart, $nextVolume).'"}]';
+                                $daysArray[$arrayIndex] = $str;
+                                $arrayIndex++;
+                                $leftChapterStart = $nextVolume;
+                                $duplicateCheck = false;
+
+                                $remainVolume = ($remainVolume - $addVolume);
+                                //echo ' #2-4 '.$str.' ';
+                            }
+                            
+                            
+                            $volume = ($remainVolume - ($remainVolume % $chapterForDay)) / $chapterForDay; 
+                            
+                            // for문 다음에 추가
+                            $volumeLeft = $remainVolume % $chapterForDay;
+
+                            for($i=0;$i<$volume;$i++) {
+                                $nextVolume = ($leftChapterStart + $chapterForDay);
+                                
+                                $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($leftChapterStart, $nextVolume).'"}';
+
+                                if(!getArrayLast() || (getArrayLast() && $last)) {
+                                    $str .= ']';
+                                    $daysArray[$arrayIndex] = $str;
+                                    $arrayIndex++;
+                                    $duplicateCheck = false;
+                                } 
+                                
+                                $leftChapterStart = $nextVolume;
+                                //echo ' #2-5 '.$str.' ';
+                            }
+                            $leftChapterStart = $nextVolume;
+        
+                            if(!getArrayLast() && $volumeLeft != 0) {
+                                $nextVolume = ($leftChapterStart + $volumeLeft);
+
+                                $str = '[{"book": "'.$curChapter.'", "volume": "'.getVolume($leftChapterStart, $nextVolume).'"}';
+                                if(getArrayLast()) {
+                                    $str .= ']';
+                                    $daysArray[$arrayIndex] = $str;
+                                    $duplicateCheck = false;
+                                }
+                                $volumeLeft = $chapterForDay - $volumeLeft;
+                                //echo ' #2-6 '.$str.' ';
+                            }
+                        }
+        
+                        
                     }
-    
-                    
-                }
-                else if($curVolume < $volumeLeft) {
+                    else if($curVolume < $volumeLeft) {
 
-                    $nextVolume = $startVolume + $curVolume;
+                        $nextVolume = $startVolume + $curVolume;
 
-                    $str .= ', {"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}';
-                    $leftChapterStart = ($curVolume + 1);
-                    $volumeLeft = ($volumeLeft - $curVolume);
-                    if(getArrayLast()) {
-                        $str .= ']';
-                        $daysArray[$arrayIndex] = $str;
-                        $duplicateCheck = false;
+                        $str .= ', {"book": "'.$curChapter.'", "volume": "'.getVolume($startVolume, $nextVolume).'"}';
+                        $leftChapterStart = ($curVolume + 1);
+                        $volumeLeft = ($volumeLeft - $curVolume);
+                        if(getArrayLast()) {
+                            $str .= ']';
+                            $daysArray[$arrayIndex] = $str;
+                            $duplicateCheck = false;
+                        }
+                        //echo ' #2-7 '.$str.' ';
+
                     }
-                    //echo ' #2-7 '.$str.' ';
 
                 }
 
+                
+            }
+
+            //print_r($daysArray);
+
+            foreach ($daysArray as $key => $value) {
+                $days = ((int)$key)+1;
+                $customBiblePlanResult = setUserBibleCustom($newBiblePlanSeqNo, $days, $value);
+                if($customBiblePlanResult == 1) {
+                    $customBibleStatus = true;
+                }
+                else {
+                    $customBibleStatus = false;
+                }
             }
 
             
         }
 
-        //print_r($daysArray);
-
-        foreach ($daysArray as $key => $value) {
-            $days = ((int)$key)+1;
-            $customBiblePlanResult = setUserBibleCustom($newBiblePlanSeqNo, $days, $value);
-            if($customBiblePlanResult == 1) {
-                $customBibleStatus = true;
-            }
-            else {
-                $customBibleStatus = false;
-            }
+        if($goalResultStatus && $statusUpdateStatus && $biblePlanStatus && $customBibleStatus) {
+            echo '{"result":"success", "jwt": "'.$jwt.'"}';
+        }
+        else {
+            echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
         }
 
-        
-    }
-
-    if($goalResultStatus && $statusUpdateStatus && $biblePlanStatus && $customBibleStatus) {
-        echo '{"result":"success"}';
-    }
-    else {
-        echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
     }
  
 

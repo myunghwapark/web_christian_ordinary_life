@@ -1,12 +1,10 @@
 <?php
+require_once $_SERVER["DOCUMENT_ROOT"].'/col/common/header.php';
+require('../../database/thank_diary_query.php');
 
 try {
-	require('../../database/database.php');
-    require('../../database/thank_diary_query.php');
+    $jwtCls = new Jwt();
 
-    $json = file_get_contents('php://input');
-    $obj = json_decode($json,true);
-	
     $userSeqNo = $obj['userSeqNo'];
     $searchKeyword = $obj['searchKeyword'];
     $searchStartDate = $obj['searchStartDate'];
@@ -14,27 +12,36 @@ try {
     $categoryNo = $obj['categoryNo'];
     $startPageNum = $obj['startPageNum'];
     $rowCount = $obj['rowCount'];
+    $keepLogin = $obj['keepLogin'];
+    $jwt = $obj['jwt'];
 
-    $listResult = getThankDiaryList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $categoryNo, $startPageNum, $rowCount);
+    $auch = $jwtCls->dehashing($jwt);
     
-    $numResults = mysqli_num_rows($listResult);
-    
-    $totalCntResult = getThankDiaryTotalCnt($userSeqNo, $searchKeyword);
-    $totalCntRow = mysqli_fetch_assoc($totalCntResult);
-    $totalCnt = $totalCntRow['totalCnt'];
+    if($auch) {
+            
+        $jwt = $jwtCls->hashing($userSeqNo, $keepLogin);
 
-    $counter = 0;
-    
-    echo '{"result":"success", "totalCnt": '.$totalCnt.', "diaryList": [';
-	if ($listResult->num_rows > 0) {
-		while($row = mysqli_fetch_assoc($listResult)) {
-			echo json_encode($row);
-			if (++$counter != $numResults) {
-				echo',';
-			}
-		}
-	}
-	echo ']}';
+        $listResult = getThankDiaryList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $categoryNo, $startPageNum, $rowCount);
+        
+        $numResults = mysqli_num_rows($listResult);
+        
+        $totalCntResult = getThankDiaryTotalCnt($userSeqNo, $searchKeyword);
+        $totalCntRow = mysqli_fetch_assoc($totalCntResult);
+        $totalCnt = $totalCntRow['totalCnt'];
+
+        $counter = 0;
+        
+        echo '{"result":"success", "jwt": "'.$jwt.'", "totalCnt": '.$totalCnt.', "diaryList": [';
+        if ($listResult->num_rows > 0) {
+            while($row = mysqli_fetch_assoc($listResult)) {
+                echo json_encode($row);
+                if (++$counter != $numResults) {
+                    echo',';
+                }
+            }
+        }
+        echo ']}';
+    }
 }
 catch (Exception $e) {
     echo '{"result":"fail", "errorCode": "00", "errorMessage": "'.$e->getMessage().'"}';

@@ -1,23 +1,29 @@
 <?php
+require_once $_SERVER["DOCUMENT_ROOT"].'/col/common/header.php';
+require('../../database/qt_record_query.php');
 
 try {
-	require('../../database/database.php');
-    require('../../database/qt_record_query.php');
-    require('../../common/error_message.php');
-
-    $json = file_get_contents('php://input');
-    $obj = json_decode($json,true);
+    $jwtCls = new Jwt();
 	
     $userSeqNo = $obj['userSeqNo'];
     $qtRecordSeqNo = $obj['qtRecordSeqNo'];
+    $keepLogin = $obj['keepLogin'];
+    $jwt = $obj['jwt'];
 
-    $result = deleteQtRecord($userSeqNo, $qtRecordSeqNo);
+    $auch = $jwtCls->dehashing($jwt);
+    
+    if($auch) {
+            
+        $jwt = $jwtCls->hashing($userSeqNo, $keepLogin);
 
-    if($result == 1) {
-        echo '{"result":"success"}';
-    }
-    else {
-        echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
+        $result = deleteQtRecord($userSeqNo, $qtRecordSeqNo);
+
+        if($result == 1) {
+            echo '{"result":"success", "jwt": "'.$jwt.'"}';
+        }
+        else {
+            echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
+        }
     }
 }
 catch (Exception $e) {

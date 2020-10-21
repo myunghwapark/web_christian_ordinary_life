@@ -1,58 +1,63 @@
 <?php
+require_once $_SERVER["DOCUMENT_ROOT"].'/col/common/header.php';
+require('../../database/goal_query.php');
 
 try {
-	require('../../database/database.php');
-    require('../../database/goal_query.php');
-    require('../../common/error_message.php');
-
-    $json = file_get_contents('php://input');
-    $obj = json_decode($json,true);
+    $jwtCls = new Jwt();
 	
     $userSeqNo = $obj['userSeqNo'];
     $goalDate = $obj['goalDate'];
     $praying = $obj['praying'];
+    $keepLogin = $obj['keepLogin'];
+    $jwt = $obj['jwt'];
 
+    $auch = $jwtCls->dehashing($jwt);
 
-	$getGoalResult = getGoalProgress($userSeqNo, $goalDate);
-	$numGetGoalResults = mysqli_num_rows($getGoalResult);
-	
-    $counter = 0;
+    if($auch) {
+            
+        $jwt = $jwtCls->hashing($userSeqNo, $keepLogin);
 
-	if($numGetGoalResults > 0) {
+        $getGoalResult = getGoalProgress($userSeqNo, $goalDate);
+        $numGetGoalResults = mysqli_num_rows($getGoalResult);
+        
+        $counter = 0;
 
-        $result = updatePrayingProgress($userSeqNo, $goalDate, $praying);
+        if($numGetGoalResults > 0) {
 
-        if($result == 1) {
-            echo '{"result":"success"}';
-        }
-        else {
-            echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
-        }
-    }
-    else {
+            $result = updatePrayingProgress($userSeqNo, $goalDate, $praying);
 
-        $userGoalResult = getUserGoal($userSeqNo);
-        $numUserGoalResult = mysqli_num_rows($userGoalResult);
-    
-    
-        $readingBible = "";
-        $thankDiary = "";
-        $qtRecord = "";
-        if($numUserGoalResult > 0) {
-            while($row = mysqli_fetch_array($userGoalResult)){
-                $readingBible = $row['readingBible'] != 'true' ? '-' : 'n';
-                $thankDiary = $row['thankDiary'] != 'true' ? '-' : 'n';
-                $qtRecord = $row['qtRecord'] != 'true' ? '-' : 'n';
+            if($result == 1) {
+                echo '{"result":"success", "jwt": "'.$jwt.'"}';
+            }
+            else {
+                echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
             }
         }
-
-        $result = setGoalProgress($userSeqNo, $goalDate, $readingBible, $thankDiary, $qtRecord, $praying);
-
-        if($result == 1) {
-            echo '{"result":"success"}';
-        }
         else {
-            echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
+
+            $userGoalResult = getUserGoal($userSeqNo);
+            $numUserGoalResult = mysqli_num_rows($userGoalResult);
+        
+        
+            $readingBible = "";
+            $thankDiary = "";
+            $qtRecord = "";
+            if($numUserGoalResult > 0) {
+                while($row = mysqli_fetch_array($userGoalResult)){
+                    $readingBible = $row['readingBible'] != 'true' ? '-' : 'n';
+                    $thankDiary = $row['thankDiary'] != 'true' ? '-' : 'n';
+                    $qtRecord = $row['qtRecord'] != 'true' ? '-' : 'n';
+                }
+            }
+
+            $result = setGoalProgress($userSeqNo, $goalDate, $readingBible, $thankDiary, $qtRecord, $praying);
+
+            if($result == 1) {
+                echo '{"result":"success", "jwt": "'.$jwt.'"}';
+            }
+            else {
+                echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
+            }
         }
     }
 

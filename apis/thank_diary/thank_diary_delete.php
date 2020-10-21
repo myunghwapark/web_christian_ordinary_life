@@ -1,29 +1,35 @@
 <?php
+require_once $_SERVER["DOCUMENT_ROOT"].'/col/common/header.php';
+require('../../database/thank_diary_query.php');
 
 try {
-	require('../../database/database.php');
-    require('../../database/thank_diary_query.php');
-    require('../../common/error_message.php');
-
-    $json = file_get_contents('php://input');
-    $obj = json_decode($json,true);
+    $jwtCls = new Jwt();
 	
     $userSeqNo = $obj['userSeqNo'];
     $thankDiarySeqNo = $obj['thankDiarySeqNo'];
     $imageURL = $obj['imageURL'];
+    $keepLogin = $obj['keepLogin'];
+    $jwt = $obj['jwt'];
 
-    $result = deleteThankDiary($userSeqNo, $thankDiarySeqNo);
+    $auch = $jwtCls->dehashing($jwt);
+    
+    if($auch) {
+            
+        $jwt = $jwtCls->hashing($userSeqNo, $keepLogin);
 
-	if($imageURL != null && $imageURL != '') {
-		$saveFileName = $_SERVER['DOCUMENT_ROOT'] . '/col/images/diary/' . $imageURL;
-		if(file_exists($saveFileName)) unlink($saveFileName);
-	}
+        $result = deleteThankDiary($userSeqNo, $thankDiarySeqNo);
 
-    if($result == 1) {
-        echo '{"result":"success"}';
-    }
-    else {
-        echo '{"result":"fail", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
+        if($imageURL != null && $imageURL != '') {
+            $saveFileName = $_SERVER['DOCUMENT_ROOT'] . '/col/images/diary/' . $imageURL;
+            if(file_exists($saveFileName)) unlink($saveFileName);
+        }
+
+        if($result == 1) {
+            echo '{"result":"success", "jwt": "'.$jwt.'"}';
+        }
+        else {
+            echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
+        }
     }
 }
 catch (Exception $e) {

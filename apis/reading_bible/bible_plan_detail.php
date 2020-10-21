@@ -1,13 +1,9 @@
 <?php
+require_once $_SERVER["DOCUMENT_ROOT"].'/col/common/header.php';
+require('../../database/reading_bible_query.php');
 
 try {
-	require('../../database/database.php');
-    require('../../database/reading_bible_query.php');
-
-    $json = file_get_contents('php://input');
-    $obj = json_decode($json,true);
 	
-    //$biblePlanId = 'proverbs';
     $biblePlanId = $obj['biblePlanId'];
 
     $listResult = getBiblePlanDetail($biblePlanId);

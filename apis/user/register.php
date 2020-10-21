@@ -1,15 +1,8 @@
 <?php
+require_once $_SERVER["DOCUMENT_ROOT"].'/col/common/header.php';
+require('../../database/user_query.php');
 
 try {
-	require('../../database/database.php');
-	require('../../database/user_query.php');
-
-    // Getting the received JSON into $json variable.
-    $json = file_get_contents('php://input');
- 
-    // Decoding the received JSON and store into $obj variable.
-    $obj = json_decode($json,true);
-
     
 	$userName = $obj['userName'];
 	$userEmail = $obj['userEmail'];

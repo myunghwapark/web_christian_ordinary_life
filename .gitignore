@@ -1,5 +1,6 @@
-apis/user/jwt.php
+common/jwt.php
 database/database.php
+common/header.php
 images/*
 
 # macOS

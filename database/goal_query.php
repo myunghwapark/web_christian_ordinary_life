@@ -461,38 +461,6 @@
             return "Fail : ".$ex->getMessage()."<br>";
         }
     }
-/* 
-    function getMonthGoalProgress($userSeqNo, $yearMonth) {
-        try {
-            global $connection;
-            $query = "Select 
-                A.reading_bible as readingBible, 
-                A.thank_diary as thankDiary, 
-                A.qt_record as qtRecord, 
-                A.praying as praying, 
-                A.goal_date as goalDate,
-                C.bible_plan_id biblePlanID
-            from (select * from tbGoalProgress where DATE_FORMAT(goal_date, '%Y-%m') = '$yearMonth' and user_seq_no = '$userSeqNo') A
-            LEFT JOIN (select * from tbGoalBibleProgress where DATE_FORMAT(goal_date, '%Y-%m') = '$yearMonth' and user_seq_no = '$userSeqNo') B 
-            ON A.goal_date = B.goal_date
-            LEFT JOIN tbUserBiblePlan as C
-            ON A.user_seq_no = B.user_seq_no
-            and B.user_bible_plan_seq_no = C.user_bible_plan_seq_no
-            group by DATE_FORMAT(A.goal_date, '%Y-%m-%d')
-            order by A.goal_date;";
-
-            $result = mysqli_query($connection, $query);
-
-            if($result == false) {
-                echo "error: " . mysqli_error($connection);
-            }
-            return $result;
-        }
-        catch(PDOException $ex) {
-            return "Fail : ".$ex->getMessage()."<br>";
-        }
-    }
- */
 
     function getMonthGoalProgress($userSeqNo, $yearMonth) {
         try {

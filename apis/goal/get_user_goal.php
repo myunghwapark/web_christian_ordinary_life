@@ -1,35 +1,45 @@
 <?php
+require_once $_SERVER["DOCUMENT_ROOT"].'/col/common/header.php';
+require('../../database/goal_query.php');
+
+//use \Firebase\JWT\JWT;
 
 try {
-	require('../../database/database.php');
-    require('../../database/goal_query.php');
 
-    $json = file_get_contents('php://input');
-    $obj = json_decode($json,true);
-	
     $userSeqNo = $obj['userSeqNo'];
+    $keepLogin = $obj['keepLogin'];
+    $jwt = $obj['jwt'];
 
-	$result = getUserGoal($userSeqNo);
-	$numResults = mysqli_num_rows($result);
-	
-    $counter = 0;
+    $jwtCls = new Jwt();
 
-	if($numResults > 0) {
+    $auch = $jwtCls->dehashing($jwt);
+    if($auch) {
+            
+        $jwt = $jwtCls->hashing($userSeqNo, $keepLogin);
 
-        echo '{"result":"success", "goalInfo":[';
+        $result = getUserGoal($userSeqNo);
+        $numResults = mysqli_num_rows($result);
+        
+        $counter = 0;
 
-        $goalSeqNo = "";
-        $readingBible = "";
-        while($row = mysqli_fetch_assoc($result)){
-            echo json_encode($row);
-			if (++$counter != $numResults) {
-				echo",";
-			}
+        if($numResults > 0) {
+
+            echo '{"result":"success", "jwt": "'.$jwt.'", "goalInfo":[';
+
+            $goalSeqNo = "";
+            $readingBible = "";
+            while($row = mysqli_fetch_assoc($result)){
+                echo json_encode($row);
+                if (++$counter != $numResults) {
+                    echo",";
+                }
+            }
+            echo ']}';
         }
-		echo ']}';
-    }
-    else {
-        echo '{"result":"fail", "errorCode": "01", "errorMessage": "There are no goals set."}';
+        else {
+            echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "01", "errorMessage": "There are no goals set."}';
+        }
+
     }
 
 }
