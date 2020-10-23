@@ -7,20 +7,22 @@ try {
 	$userName = $obj['userName'];
 	$userEmail = $obj['userEmail'];
 	$userPassword = $obj['userPassword'];
-    $userGrade = $obj['userGrade'];
+    $userGrade = $obj['userGrade']; 
     
     if(!empty($userEmail) && !empty($userName) && !empty($userPassword)) {
         $getUserEmail = getUserEmail($userEmail);
     
         if($getUserEmail == 0) {
-            $result = registerUser($userName, $userEmail, $userPassword, $userGrade);
+            /* Create the new password hash. */
+            $hash = password_hash($userPassword, PASSWORD_DEFAULT, $options);
+            $result = registerUser($userName, $userEmail, $hash, $userGrade);
         
             if($result == 1) {
                 echo '{"result":"success"}';
-            }
+             }
             else {
                 echo '{"result":"fail", "errorCode": "00", "errorMessage": "'.$result.'"}';
-            }
+            } 
         }
         else {
             echo '{"result":"fail", "errorCode": "01", "errorMessage": "Email exist"}';

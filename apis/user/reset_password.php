@@ -60,8 +60,11 @@ try {
 
         $randomPassword = randPassword();
 
+        /* Create the new password hash. */
+        $hash = password_hash($randomPassword, PASSWORD_DEFAULT, $options);
+
         // Password update
-        $updatePasswordResult = updateUserPassword($recipientEmail, $randomPassword);
+        $updatePasswordResult = updateUserPassword($recipientEmail, $hash);
 
         if($updatePasswordResult == 1) {
 

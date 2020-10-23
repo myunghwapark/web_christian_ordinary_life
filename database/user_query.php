@@ -1,15 +1,15 @@
 <?php
-    function getUser($userEmail, $userPassword) {
+    function getUser($userEmail) {
         global $connection;
 		$query = "Select 
 			user_seq_no, 
 			user_name, 
 			user_email, 
-			user_grade 
+			user_grade,
+			user_password 
 			from tbUser 
 			where user_email = '$userEmail' 
-			and user_password = SHA1(UNHEX(SHA1('$userPassword'))) 
-			and user_state = 'U001_001';";
+			and user_state = 'U001_001' LIMIT 1;";
 			
 		$result = mysqli_query($connection, $query);
 
@@ -31,7 +31,7 @@
 			'$userName', 
 			'$userEmail', 
 			'$userGrade', 
-			SHA1(UNHEX(SHA1('$userPassword'))), 
+			'$userPassword', 
 			NOW());";
 
 		$result = mysqli_query($connection, $query);
@@ -76,7 +76,7 @@
 	function updateUserPassword($userEmail, $userPassword) {
 		global $connection;
 		$query = "Update tbUser set 
-			user_password=SHA1(UNHEX(SHA1('$userPassword'))), update_date=NOW() 
+			user_password='$userPassword', update_date=NOW() 
 			where user_email='$userEmail';";
 
 		$result = mysqli_query($connection, $query);

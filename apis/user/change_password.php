@@ -12,6 +12,8 @@ try {
     $newPassword = $obj['newPassword'];
     $keepLogin = $obj['keepLogin'];
     $jwt = $obj['jwt'];
+ 
+
 
     $auch = $jwtCls->dehashing($jwt);
     
@@ -19,22 +21,36 @@ try {
             
         $jwt = $jwtCls->hashing($userSeqNo, $keepLogin);
 
-        $result = getUser($userEmail, $oldPassword);
+        $result = getUser($userEmail);
         $numResults = mysqli_num_rows($result);
 
         if($numResults > 0) {
-            // Password update
-            $updatePasswordResult = updateUserPassword($userEmail, $newPassword);
+            while($row = mysqli_fetch_array($result)){
+                $savedPassword = $row['user_password'];
+            }
 
-            if($updatePasswordResult == 1) {
-                echo '{"result":"success", "jwt": "'.$jwt.'"}';
+            if (password_verify($oldPassword, $savedPassword))
+            {
+            
+                /* Create the new password hash. */
+                $hash = password_hash($newPassword, PASSWORD_DEFAULT, $options);
+
+                // Password update
+                $updatePasswordResult = updateUserPassword($userEmail, $hash);
+
+                if($updatePasswordResult == 1) {
+                    echo '{"result":"success", "jwt": "'.$jwt.'"}';
+                }
+                else {
+                    echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "03", "errorMessage": "'.$commonError["message"].'"}';
+                }
             }
             else {
-                echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "01", "errorMessage": "'.$commonError["message"].'"}';
+                echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "02", "errorMessage": "There is no user matching the registered email or password."}';
             }
         }
         else {
-            echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "00", "errorMessage": "There is no user matching the registered email or password."}';
+            echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "01", "errorMessage": "There is no user matching the registered email or password."}';
         }
     }
 
