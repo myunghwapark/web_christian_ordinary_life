@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER["DOCUMENT_ROOT"].'/col/common/header.php';
+require('../../common/header.php');
 require('../../database/qt_record_query.php');
 
 try {
