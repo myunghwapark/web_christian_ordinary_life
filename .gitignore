@@ -1,7 +1,7 @@
 common/jwt.php
 database/database.php
 common/header.php
-images/*
+images/diary/*
 
 # macOS
 .DS_Store
