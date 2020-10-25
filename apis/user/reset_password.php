@@ -1,6 +1,6 @@
 <?php
-require('../../common/header.php');
-require('../../database/user_query.php');
+require_once('../../common/header.php');
+require_once('../../database/user_query.php');
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;

@@ -1,15 +1,15 @@
 <?php
-require('../../common/header.php');
-require('../../database/goal_query.php');
+require_once('../../common/header.php');
+require_once('../../database/goal_query.php');
 
 //use \Firebase\JWT\JWT;
 
 try {
-
+ 
     $userSeqNo = $obj['userSeqNo'];
     $keepLogin = $obj['keepLogin'];
     $jwt = $obj['jwt'];
-
+ 
     $jwtCls = new Jwt();
 
     $auch = $jwtCls->dehashing($jwt);

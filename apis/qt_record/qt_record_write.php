@@ -1,7 +1,7 @@
 <?php
-require('../../common/header.php');
-require('../../database/qt_record_query.php');
-require('../../database/goal_query.php');
+require_once('../../common/header.php');
+require_once('../../database/qt_record_query.php');
+require_once('../../database/goal_query.php');
 
 try {
     $jwtCls = new Jwt();

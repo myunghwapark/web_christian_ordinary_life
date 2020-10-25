@@ -1,6 +1,6 @@
 <?php
-require('../../common/header.php');
-require('../../database/bible_phrase_query.php');
+require_once('../../common/header.php');
+require_once('../../database/bible_phrase_query.php');
 
 try {
 	

@@ -1,7 +1,7 @@
 <?php
-require('../../common/header.php');
-require('../../database/goal_query.php');
-require('../../database/reading_bible_query.php');
+require_once('../../common/header.php');
+require_once('../../database/goal_query.php');
+require_once('../../database/reading_bible_query.php');
 
 try {
     $jwtCls = new Jwt();
