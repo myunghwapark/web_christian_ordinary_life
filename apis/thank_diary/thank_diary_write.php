@@ -33,6 +33,7 @@ try {
         $fileName = '';
         $success = true;
         $newDiary = false;
+        $saveFileName = '';
 
         if($userSeqNo != null && $userSeqNo != '') {
 
@@ -101,7 +102,7 @@ try {
                 $result = updateThankDiaryProgress($userSeqNo, $goalDate, $thankDiary);
         
                 if($result == 1) {
-                    echo '{"result":"success", "jwt": "'.$jwt.'"}';
+                    echo '{"result":"success", "jwt": "'.$jwt.'", "imageUrl":"'.$saveFileName.'"}';
                 }
                 else {
                     echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
