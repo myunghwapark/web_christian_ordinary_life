@@ -42,7 +42,7 @@ try {
             
             
             if($imageStatus == 'replace' || $imageStatus == 'delete') {
-                $saveFileName = $_SERVER['DOCUMENT_ROOT'] . '/col/images/diary/' . $imageURL;
+                $saveFileName = $serverImageUrl . $imageURL;
             
                 if(file_exists($saveFileName)) unlink($saveFileName);
             }

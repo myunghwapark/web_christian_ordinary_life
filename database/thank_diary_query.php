@@ -164,8 +164,8 @@
         
         global $connection;
         $query = "Select 
-            (MaX(thank_diary_seq_no) + 1) thankDiarySeqNo 
-        FROM tbThankDiary;";
+            IFNULL((MaX(thank_diary_seq_no) + 1), 1) thankDiarySeqNo 
+        FROM tbThankDiary";
             
         $result = mysqli_query($connection, $query);
 
