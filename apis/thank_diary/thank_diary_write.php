@@ -64,7 +64,7 @@ try {
 
                 $date = date("YmdHis" ,time());
                 $fileNameStr = $thankDiarySeqNo . '_' . $userSeqNo. '_' . $date;
-                $saveFileName = $_SERVER['DOCUMENT_ROOT'] . '/col/images/diary/' . $fileNameStr;
+                $saveFileName = $serverImageUrl . $fileNameStr;
             
                 $fileName = $fileNameStr;
 
