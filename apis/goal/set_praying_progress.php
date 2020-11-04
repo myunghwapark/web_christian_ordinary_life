@@ -11,7 +11,7 @@ try {
     $keepLogin = $obj['keepLogin'];
     $jwt = $obj['jwt'];
 
-    $auch = $jwtCls->dehashing($jwt);
+    $auch = $jwtCls->dehashing($jwt, $userSeqNo);
 
     if($auch) {
             

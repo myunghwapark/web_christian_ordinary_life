@@ -12,7 +12,7 @@ try {
  
     $jwtCls = new Jwt();
 
-    $auch = $jwtCls->dehashing($jwt);
+    $auch = $jwtCls->dehashing($jwt, $userSeqNo);
     if($auch) {
             
         $jwt = $jwtCls->hashing($userSeqNo, $keepLogin);

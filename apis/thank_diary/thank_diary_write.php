@@ -102,7 +102,7 @@ try {
                 $result = updateThankDiaryProgress($userSeqNo, $goalDate, $thankDiary);
         
                 if($result == 1) {
-                    echo '{"result":"success", "jwt": "'.$jwt.'", "imageUrl":"'.$saveFileName.'"}';
+                    echo '{"result":"success", "jwt": "'.$jwt.'"}';
                 }
                 else {
                     echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';

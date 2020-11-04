@@ -15,7 +15,7 @@ try {
  
 
 
-    $auch = $jwtCls->dehashing($jwt);
+    $auch = $jwtCls->dehashing($jwt, $userSeqNo);
     
     if($auch) {
             

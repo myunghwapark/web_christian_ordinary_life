@@ -27,7 +27,7 @@ try {
     $planEndDate = '2020-08-25 00:00:00';
   */
     $jwtCls = new Jwt();
-     
+      
     $userSeqNo = $obj['userSeqNo'];
     $readingBible = $obj['readingBible'];
     $thankDiary = $obj['thankDiary'];
@@ -38,22 +38,21 @@ try {
     $prayingAlarm = $obj['prayingAlarm'];
     $prayingTime = $obj['prayingTime'];
     $prayingDuration = $obj['prayingDuration'];
-
+    $keepBiblePlan = $obj['keepBiblePlan'];
+    
     $biblePlanId = $obj['biblePlanId'];
     $planPeriod = $obj['planPeriod'];
     $customBible = $obj['customBible'];
     $planEndDate = $obj['planEndDate']; 
     $keepLogin = $obj['keepLogin'];
-    $jwt = $obj['jwt'];
+    $jwt = $obj['jwt']; 
 
-    $auch = $jwtCls->dehashing($jwt);
+
+    $auch = $jwtCls->dehashing($jwt, $userSeqNo);
     
     if($auch) {
             
         $jwt = $jwtCls->hashing($userSeqNo, $keepLogin);
- 
-        //echo 'customBible: '.$customBible;
-        //echo 'planPeriod: '.$planPeriod;
 
 
         $getGoalResult = getUserGoal($userSeqNo);
@@ -100,7 +99,7 @@ try {
         $biblePlanResultCnt = mysqli_num_rows($getBiblePlanResult);
         
         // Case of when there is a old bible plan
-        if($biblePlanResultCnt != 0) {
+        if($biblePlanResultCnt != 0 && $keepBiblePlan != 1) {
             // update needed
             $userBiblePlanSeqNo = "";
             while($row = mysqli_fetch_array($getBiblePlanResult)){
@@ -118,7 +117,7 @@ try {
         }
 
         // Case of when user set reading bible
-        if($readingBible == true || $readingBible == 'true') {
+        if($readingBible == 1 && $keepBiblePlan != 1) {
 
             $setBiblePlanResult = setUserBiblePlan($userSeqNo, $biblePlanId, $planPeriod, $customBible, $planEndDate);
     
@@ -132,7 +131,7 @@ try {
         }
             
         
-        if(($readingBible == true || $readingBible == 'true') && $biblePlanId == 'custom') {
+        if($readingBible == 1 && $keepBiblePlan != 1 && $biblePlanId == 'custom') {
 
             $newBiblePlanSeqNo = '';
             $newBiblePlanResult = getUserBiblePlanSeqNo($userSeqNo);
@@ -152,9 +151,6 @@ try {
             }
             $chapterForDay = ($totalVolume - ($totalVolume % $planPeriod)) / $planPeriod; 
             $chapterLeft = $totalVolume % $planPeriod;
-            //echo 'totalVolume: '.$totalVolume;
-            //echo 'chapterForDay: '.$chapterForDay;
-            //echo 'chapterLeft: '.$chapterLeft;
 
             $startVolume = 1;
             $nextVolume = 0;
