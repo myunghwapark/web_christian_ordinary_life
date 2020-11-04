@@ -21,7 +21,7 @@ try {
     $keepLogin = $obj['keepLogin'];
     $jwt = $obj['jwt'];
 
-    $auch = $jwtCls->dehashing($jwt);
+    $auch = $jwtCls->dehashing($jwt, $userSeqNo);
     
     if($auch) {
             
@@ -31,7 +31,6 @@ try {
         $realImage;
         $setResult;
         $fileName = '';
-        $success = true;
         $newDiary = false;
         $saveFileName = '';
 
@@ -90,7 +89,7 @@ try {
         }
 
 
-        if($success && $setResult == 1) {
+        if($setResult == 1) {
 
             $getGoalResult = getGoalProgress($userSeqNo, $goalDate);
             $numGetGoalResults = mysqli_num_rows($getGoalResult);
@@ -131,9 +130,12 @@ try {
                     echo '{"result":"success", "jwt": "'.$jwt.'"}';
                 }
                 else {
-                    echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
+                    echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "02", "errorMessage": "'.$commonError["message"].'"}';
                 }
             }
+        }
+        else {
+            echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "01", "errorMessage": "'.$commonError["message"].'"}';
         }
     }
 

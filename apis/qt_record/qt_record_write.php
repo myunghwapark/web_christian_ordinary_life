@@ -78,9 +78,12 @@ try {
                     echo '{"result":"success", "jwt": "'.$jwt.'"}';
                 }
                 else {
-                    echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "'.$commonError["code"].'", "errorMessage": "'.$commonError["message"].'"}';
+                    echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "02", "errorMessage": "'.$commonError["message"].'"}';
                 }
             }
+        }
+        else {
+            echo '{"result":"fail", "errorCode": "01", "errorMessage": "'.$e->getMessage().'"}';
         }
     }
 
