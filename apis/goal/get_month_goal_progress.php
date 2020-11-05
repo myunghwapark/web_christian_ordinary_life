@@ -7,6 +7,7 @@ try {
 	
     $userSeqNo = $obj['userSeqNo'];
     $yearMonth = $obj['yearMonth'];
+    $now = $obj['today'];
 
     $keepLogin = $obj['keepLogin'];
     $jwt = $obj['jwt'];
@@ -54,7 +55,6 @@ try {
         $counter = 0;
         $firstRow = false;
 
-        $now = date('y-m-d');
         $today = new DateTime($now);
 
         if($monthlyGoalProgressNumResult > 0) {

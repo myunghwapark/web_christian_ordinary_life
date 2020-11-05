@@ -439,7 +439,8 @@
     function getUserGoalHistory($userSeqNo, $yearMonth) {
         try {
             global $connection;
-            $query = "SELECT 
+            $query = "
+            SELECT 
                 IF(reading_bible, 'true', 'false') as readingBible, 
                 IF(thank_diary, 'true', 'false') as thankDiary, 
                 IF(qt_record, 'true', 'false') as qtRecord, 
@@ -449,7 +450,7 @@
             FROM tbGoalHistory
             WHERE 
                 user_seq_no = '$userSeqNo' and
-                DATE_FORMAT(goal_set_date, '%Y-%m') = '$yearMonth' order by goal_set_date;";
+                DATE_FORMAT(goal_set_date, '%Y-%m') = '$yearMonth' order by goal_set_date DESC;";
             $result = mysqli_query($connection, $query);
 
             if($result == false) {
