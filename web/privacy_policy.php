@@ -15,10 +15,10 @@ $language = $_GET["language"];
       <?php
 
       if($language == 'ko') {
-        include_once 'privacy_policy_ko.html';
+        include_once 'privacy_policy_ko.php';
       }
       else {
-        include_once 'privacy_policy_en.html';
+        include_once 'privacy_policy_en.php';
       }
       ?>
     
