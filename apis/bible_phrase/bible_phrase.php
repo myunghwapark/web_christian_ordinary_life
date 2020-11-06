@@ -12,7 +12,7 @@ try {
     
 	$counter = 0;
     echo '{"result":"success", "biblePhrase": [';
-	if ($listResult->num_rows > 0) {
+	if ($numResults > 0) {
 		while($row = mysqli_fetch_assoc($listResult)) {
 			echo json_encode($row);
 			if (++$counter != $numResults) {

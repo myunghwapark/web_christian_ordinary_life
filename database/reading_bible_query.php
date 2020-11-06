@@ -246,7 +246,7 @@
         LEFT JOIN tbUserBiblePlan as B
         ON A.user_seq_no = B.user_seq_no
         and B.plan_status = 'P002_001'
-        and reading_bible = true;";
+        and A.reading_bible = 1;";
         $result = mysqli_query($connection, $query);
 
         if($result == false) {
