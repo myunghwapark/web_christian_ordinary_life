@@ -4,7 +4,10 @@
         COL places great importance on the protection of users&apos;  personal information, and I am doing my best to ensure that the personal information provided to me online is protected while users use my services.<br /><br/>
 
         Through the privacy policy, I inform you of the purposes and methods of using the personal information provided by users, and what measures are being taken to protect personal information.<br/> 
+<!--
         I have prepared a procedure for you to click the 「I agree」 button or the 「I do not agree」 button for the contents of our privacy policy or terms of use, and when you click the 「I agree」 button, I regard you agree with collect personal information. <br/><br/>
+
+-->
         
         COL&apos; s privacy policy may be changed from time to time due to changes in government laws and guidelines or changes in our internal policy, and can be viewed at any time in the settings menu on the app.<br/>
   </p> 
