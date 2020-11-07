@@ -29,21 +29,19 @@ try {
         
         $readingBibleYn = checkBibleSelected($userSeqNo);
         $numReadingBibleYn = mysqli_num_rows($readingBibleYn);
-        syslog(LOG_INFO, ' numReadingBibleYn: '.$numReadingBibleYn);
         
         if($numReadingBibleYn > 0) {
 
             while($row = mysqli_fetch_array($readingBibleYn)){
                 $biblePlanId = $row['biblePlanId'];
             }
-            syslog(LOG_INFO, ' biblePlanId: '.$biblePlanId);
 
             if($biblePlanId == null) {
                 echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "02", "errorMessage": "biblePlanId dosen exist."}';
             }
             else {
 
-                $biblePlanResult = getCurrentBiblePlanSeqNo();
+                $biblePlanResult = getCurrentBiblePlanSeqNo($userSeqNo);
                 $numBiblePlanResult = mysqli_num_rows($biblePlanResult);
 
                 if($numBiblePlanResult > 0) {

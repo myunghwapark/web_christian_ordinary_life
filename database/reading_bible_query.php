@@ -180,12 +180,13 @@
 		return $result;
     }
 
-    function getCurrentBiblePlanSeqNo() {
+    function getCurrentBiblePlanSeqNo($userSeqNo) {
         global $connection;
         $query = "Select 
             user_bible_plan_seq_no userBiblePlanSeqNo
         from tbUserBiblePlan 
         where plan_status = 'P002_001'
+            and user_seq_no='$userSeqNo'
             order by user_bible_plan_seq_no desc LIMIT 1;";
         $result = mysqli_query($connection, $query);
 
