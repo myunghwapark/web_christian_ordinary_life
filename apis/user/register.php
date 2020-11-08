@@ -21,7 +21,7 @@ try {
                 echo '{"result":"success"}';
              }
             else {
-                echo '{"result":"fail", "errorCode": "00", "errorMessage": "'.$result.'"}';
+                echo '{"result":"fail", "errorCode": "03", "errorMessage": "'.$result.'"}';
             } 
         }
         else {
