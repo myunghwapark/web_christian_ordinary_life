@@ -8,6 +8,7 @@ try {
     $userSeqNo = $obj['userSeqNo'];
     $thankDiarySeqNo = $obj['thankDiarySeqNo'];
 	$diaryDate = $obj['diaryDate'];
+	$language = $obj['language'];
 	
     $keepLogin = $obj['keepLogin'];
     $jwt = $obj['jwt'];
@@ -21,11 +22,11 @@ try {
 		$detailResult;
 		$deatilNumResults;
 		if($thankDiarySeqNo != null && $thankDiarySeqNo != '') {
-			$detailResult = getThankDiaryBySeqNo($thankDiarySeqNo);
+			$detailResult = getThankDiaryBySeqNo($thankDiarySeqNo, $language);
 			$deatilNumResults = mysqli_num_rows($detailResult);
 		}
 		else {
-			$detailResult = getThankDiaryByDiaryDate($diaryDate);
+			$detailResult = getThankDiaryByDiaryDate($diaryDate, $language);
 			$deatilNumResults = mysqli_num_rows($detailResult);
 		}
 		

@@ -1,5 +1,5 @@
 <?php
-    function getThankDiaryList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $categoryNo, $startPageNum, $rowCount) {
+    function getThankDiaryList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $categoryNo, $startPageNum, $rowCount, $language) {
         $searchQuery = "";
         if($searchKeyword != null && $searchKeyword != '') {
             $searchQuery = " and (title LIKE '%$searchKeyword%' or content LIKE '%$searchKeyword%') ";
@@ -18,7 +18,8 @@
             content, 
             image_url imageURL,
             thank_category_no categoryNo,
-            (select thank_category_image_url from tbThankCategory where thank_category_no = A.thank_category_no) as categoryImageUrl
+            (select thank_category_image_url from tbThankCategory where thank_category_no = A.thank_category_no) as categoryImageUrl,
+            (select CASE WHEN '$language' = 'ko' THEN thank_category_title_ko ELSE thank_category_title_en END from tbThankCategory where thank_category_no = A.thank_category_no) as categoryTitle
             from tbThankDiary A 
             where user_seq_no = '$userSeqNo'  $searchQuery order by create_date DESC LIMIT $startPageNum, $rowCount;";
             
@@ -50,17 +51,18 @@
     }
 
 
-    function getThankDiaryBySeqNo($thankDiarySeqNo) {
+    function getThankDiaryBySeqNo($thankDiarySeqNo, $language) {
         global $connection;
         $query = "Select 
-            thank_diary_seq_no thankDiarySeqNo, 
+            thank_diary_seq_no seqNo, 
             title, 
             diary_date diaryDate, 
             content,
             create_date createDate, 
             image_url imageURL,
             thank_category_no categoryNo,
-            (select thank_category_image_url from tbThankCategory where thank_category_no = A.thank_category_no) as categoryImageUrl 
+            (select thank_category_image_url from tbThankCategory where thank_category_no = A.thank_category_no) as categoryImageUrl,
+            (select CASE WHEN '$language' = 'ko' THEN thank_category_title_ko ELSE thank_category_title_en END from tbThankCategory where thank_category_no = A.thank_category_no) as categoryTitle 
             from tbThankDiary A 
             where thank_diary_seq_no = '$thankDiarySeqNo';";
             
@@ -73,17 +75,18 @@
     }
 
 
-    function getThankDiaryByDiaryDate($diaryDate) {
+    function getThankDiaryByDiaryDate($diaryDate, $language) {
         global $connection;
         $query = "Select 
-            thank_diary_seq_no thankDiarySeqNo, 
+            thank_diary_seq_no seqNo, 
             title, 
             diary_date diaryDate, 
             content,
             create_date createDate, 
             image_url imageURL,
             thank_category_no categoryNo,
-            (select thank_category_image_url from tbThankCategory where thank_category_no = A.thank_category_no) as categoryImageUrl 
+            (select thank_category_image_url from tbThankCategory where thank_category_no = A.thank_category_no) as categoryImageUrl,
+            (select CASE WHEN '$language' = 'ko' THEN thank_category_title_ko ELSE thank_category_title_en END from tbThankCategory where thank_category_no = A.thank_category_no) as categoryTitle 
             from tbThankDiary A 
             where Date(diary_date) = Date('$diaryDate') order by create_date DESC LIMIT 1;";
             

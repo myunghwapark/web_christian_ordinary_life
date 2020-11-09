@@ -13,6 +13,7 @@ try {
     $startPageNum = $obj['startPageNum'];
     $rowCount = $obj['rowCount'];
     $keepLogin = $obj['keepLogin'];
+    $language = $obj['language'];
     $jwt = $obj['jwt'];
 
     $auch = $jwtCls->dehashing($jwt, $userSeqNo);
@@ -21,7 +22,7 @@ try {
             
         $jwt = $jwtCls->hashing($userSeqNo, $keepLogin);
 
-        $listResult = getThankDiaryList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $categoryNo, $startPageNum, $rowCount);
+        $listResult = getThankDiaryList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $categoryNo, $startPageNum, $rowCount, $language);
         
         $numResults = mysqli_num_rows($listResult);
         
