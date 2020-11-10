@@ -21,7 +21,7 @@
             (select thank_category_image_url from tbThankCategory where thank_category_no = A.thank_category_no) as categoryImageUrl,
             (select CASE WHEN '$language' = 'ko' THEN thank_category_title_ko ELSE thank_category_title_en END from tbThankCategory where thank_category_no = A.thank_category_no) as categoryTitle
             from tbThankDiary A 
-            where user_seq_no = '$userSeqNo'  $searchQuery order by create_date DESC LIMIT $startPageNum, $rowCount;";
+            where user_seq_no = '$userSeqNo'  $searchQuery order by diary_date DESC LIMIT $startPageNum, $rowCount;";
             
         $result = mysqli_query($connection, $query);
 

@@ -15,7 +15,7 @@
             bible,
             content 
             from tbQtRecord 
-            where user_seq_no = '$userSeqNo'  $searchQuery order by create_date DESC LIMIT $startPageNum, $rowCount;";
+            where user_seq_no = '$userSeqNo'  $searchQuery order by qt_date DESC LIMIT $startPageNum, $rowCount;";
             
         $result = mysqli_query($connection, $query);
 
