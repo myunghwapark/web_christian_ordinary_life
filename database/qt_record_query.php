@@ -16,6 +16,8 @@
             content 
             from tbQtRecord 
             where user_seq_no = '$userSeqNo'  $searchQuery order by qt_date DESC LIMIT $startPageNum, $rowCount;";
+
+            //echo $query;
             
         $result = mysqli_query($connection, $query);
 
@@ -29,7 +31,7 @@
     function getQtRecordTotalCnt($userSeqNo, $searchKeyword) {
         $searchQuery = "";
         if($searchKeyword != null && $searchKeyword != '') {
-            $searchQuery = " and title LIKE '%$searchKeyword%' or content LIKE '%$searchKeyword%' ";
+            $searchQuery = " and title LIKE '%$searchKeyword%' or content LIKE '%$searchKeyword%' or bible LIKE '%$searchKeyword%' ";
         }
         global $connection;
         $query = "Select 
