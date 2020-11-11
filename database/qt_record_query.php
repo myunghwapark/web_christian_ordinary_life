@@ -1,13 +1,14 @@
 <?php
     function getQtRecordList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $startPageNum, $rowCount) {
+        global $connection;
+
         $searchQuery = "";
         if($searchKeyword != null && $searchKeyword != '') {
-            $searchQuery = " and (title LIKE '%$searchKeyword%' or content LIKE '%$searchKeyword%' or bible LIKE '%$searchKeyword%') ";
+            $searchQuery = " and (title LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or content LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or bible LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%') ";
         }
         if($searchStartDate != null && $searchStartDate != '') {
             $searchQuery .= " and date(qt_date) between date('$searchStartDate') and date('$searchEndDate')";
         }
-        global $connection;
         $query = "Select 
             qt_record_seq_no seqNo, 
             title, 
@@ -29,11 +30,12 @@
 
 
     function getQtRecordTotalCnt($userSeqNo, $searchKeyword) {
+        global $connection;
+        
         $searchQuery = "";
         if($searchKeyword != null && $searchKeyword != '') {
-            $searchQuery = " and title LIKE '%$searchKeyword%' or content LIKE '%$searchKeyword%' or bible LIKE '%$searchKeyword%' ";
+            $searchQuery = " and title LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or content LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or bible LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' ";
         }
-        global $connection;
         $query = "Select 
             count(qt_record_seq_no) totalCnt
             from tbQtRecord 
@@ -91,7 +93,7 @@
 
 	function insertQtRecord($userSeqNo, $title, $qtDate, $bible, $content) {
 		global $connection;
-        $query = "Insert into tbQtRecord(user_seq_no, title, qt_date, bible, content, create_date) values('$userSeqNo', '$title', '$qtDate', '$bible', '$content', NOW());";
+        $query = "Insert into tbQtRecord(user_seq_no, title, qt_date, bible, content, create_date) values('$userSeqNo', '".mysqli_real_escape_string($connection, $title)."', '".mysqli_real_escape_string($connection, $qtDate)."', '".mysqli_real_escape_string($connection, $bible)."', '".mysqli_real_escape_string($connection, $content)."', NOW());";
         
 		$result = mysqli_query($connection, $query);
 
@@ -104,7 +106,7 @@
 	function updateQtRecord($qtRecordSeqNo, $userSeqNo, $title, $qtDate, $bible, $content) {
         try {
             global $connection;
-            $query = "Update tbQtRecord set title='$title', qt_date='$qtDate', bible='$bible', content='$content', update_date=NOW() where qt_record_seq_no='$qtRecordSeqNo' and user_seq_no='$userSeqNo';";
+            $query = "Update tbQtRecord set title='".mysqli_real_escape_string($connection, $title)."', qt_date='".mysqli_real_escape_string($connection, $qtDate)."', bible='".mysqli_real_escape_string($connection, $bible)."', content='".mysqli_real_escape_string($connection, $content)."', update_date=NOW() where qt_record_seq_no='$qtRecordSeqNo' and user_seq_no='$userSeqNo';";
 
             $result = mysqli_query($connection, $query);
 

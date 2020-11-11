@@ -1,8 +1,10 @@
 <?php
     function getThankDiaryList($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $categoryNo, $startPageNum, $rowCount, $language) {
+        global $connection;
+
         $searchQuery = "";
         if($searchKeyword != null && $searchKeyword != '') {
-            $searchQuery = " and (title LIKE '%$searchKeyword%' or content LIKE '%$searchKeyword%') ";
+            $searchQuery = " and (title LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or content LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%') ";
         }
         if($searchStartDate != null && $searchStartDate != '') {
             $searchQuery .= " and date(diary_date) between date('$searchStartDate') and date('$searchEndDate')";
@@ -10,7 +12,6 @@
         if($categoryNo != null && $categoryNo != '') {
             $searchQuery .= " and thank_category_no = '$categoryNo'";
         }
-        global $connection;
         $query = "Select 
             thank_diary_seq_no seqNo, 
             title, 
@@ -32,11 +33,12 @@
     }
 
     function getThankDiaryTotalCnt($userSeqNo, $searchKeyword) {
+        global $connection;
+        
         $searchQuery = "";
         if($searchKeyword != null && $searchKeyword != '') {
-            $searchQuery = " and title LIKE '%$searchKeyword%' or content LIKE '%$searchKeyword%' ";
+            $searchQuery = " and title LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or content LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' ";
         }
-        global $connection;
         $query = "Select 
             count(thank_diary_seq_no) totalCnt
             from tbThankDiary 
@@ -101,7 +103,7 @@
 
 	function insertThankDiary($thankDiarySeqNo, $userSeqNo, $title, $diaryDate, $content, $imageURL, $categoryNo) {
 		global $connection;
-        $query = "Insert into tbThankDiary(thank_diary_seq_no, user_seq_no, title, diary_date, content, image_url, thank_category_no, create_date) values('$thankDiarySeqNo', '$userSeqNo', '$title', '$diaryDate', '$content', '$imageURL', '$categoryNo', NOW());";
+        $query = "Insert into tbThankDiary(thank_diary_seq_no, user_seq_no, title, diary_date, content, image_url, thank_category_no, create_date) values('$thankDiarySeqNo', '$userSeqNo', '".mysqli_real_escape_string($connection, $title)."', '".mysqli_real_escape_string($connection, $diaryDate)."', '".mysqli_real_escape_string($connection, $content)."', '".mysqli_real_escape_string($connection, $imageURL)."', '".mysqli_real_escape_string($connection, $categoryNo)."', NOW());";
         
 		$result = mysqli_query($connection, $query);
 
@@ -114,7 +116,7 @@
 	function updateThankDiary($thankDiarySeqNo, $userSeqNo, $title, $diaryDate, $content, $imageURL, $categoryNo) {
         try {
             global $connection;
-            $query = "Update tbThankDiary set title='$title', diary_date='$diaryDate', content='$content', image_url='$imageURL', thank_category_no='$categoryNo', update_date=NOW() where thank_diary_seq_no='$thankDiarySeqNo' and user_seq_no='$userSeqNo';";
+            $query = "Update tbThankDiary set title='".mysqli_real_escape_string($connection, $title)."', diary_date='".mysqli_real_escape_string($connection, $diaryDate)."', content='".mysqli_real_escape_string($connection, $content)."', image_url='".mysqli_real_escape_string($connection, $imageURL)."', thank_category_no='".mysqli_real_escape_string($connection, $categoryNo)."', update_date=NOW() where thank_diary_seq_no='$thankDiarySeqNo' and user_seq_no='$userSeqNo';";
 
             $result = mysqli_query($connection, $query);
 

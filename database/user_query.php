@@ -8,7 +8,7 @@
 			user_grade,
 			user_password 
 			from tbUser 
-			where user_email = '$userEmail' 
+			where user_email = '".mysqli_real_escape_string($connection, $userEmail)."' 
 			and user_state = 'U001_001' LIMIT 1;";
 			
 		$result = mysqli_query($connection, $query);
@@ -28,10 +28,10 @@
 			user_password, 
 			create_date) 
 		values(
-			'$userName', 
-			'$userEmail', 
+			'".mysqli_real_escape_string($connection, $userName)."', 
+			'".mysqli_real_escape_string($connection, $userEmail)."', 
 			'$userGrade', 
-			'$userPassword', 
+			'".mysqli_real_escape_string($connection, $userPassword)."', 
 			NOW());";
 
 		$result = mysqli_query($connection, $query);
@@ -48,7 +48,7 @@
 		$query = "Select 
 			user_email userEmailCount 
 			from tbUser 
-			where user_email = '$userEmail';";
+			where user_email = '".mysqli_real_escape_string($connection, $userEmail)."';";
 
 		$result = mysqli_query($connection, $query);
 
@@ -63,7 +63,7 @@
 		$query = "Select 
 			user_name userName 
 			from tbUser 
-			where user_email = '$userEmail';";
+			where user_email = '".mysqli_real_escape_string($connection, $userEmail)."';";
 
 		$result = mysqli_query($connection, $query);
 
@@ -76,8 +76,8 @@
 	function updateUserPassword($userEmail, $userPassword) {
 		global $connection;
 		$query = "Update tbUser set 
-			user_password='$userPassword', update_date=NOW() 
-			where user_email='$userEmail';";
+			user_password='".mysqli_real_escape_string($connection, $userPassword)."', update_date=NOW() 
+			where user_email='".mysqli_real_escape_string($connection, $userEmail)."';";
 
 		$result = mysqli_query($connection, $query);
 

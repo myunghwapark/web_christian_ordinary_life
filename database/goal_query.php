@@ -63,8 +63,8 @@
                     '$qtTime', 
                     '$praying', 
                     '$prayingAlarm', 
-                    '$prayingTime', 
-                    '$prayingDuration', 
+                    '".mysqli_real_escape_string($connection, $prayingTime)."', 
+                    '".mysqli_real_escape_string($connection, $prayingDuration)."', 
                     NOW(), 
                     NOW());";
             
@@ -91,8 +91,8 @@
             qt_alarm='$qtAlarm', 
             praying='$praying', 
             praying_alarm='$prayingAlarm', 
-            praying_time='$prayingTime', 
-            praying_duration='$prayingDuration', 
+            praying_time='".mysqli_real_escape_string($connection, $prayingTime)."', 
+            praying_duration='".mysqli_real_escape_string($connection, $prayingDuration)."', 
             update_date=NOW() 
             where user_seq_no='$userSeqNo';";
 
@@ -152,8 +152,8 @@
                     '$qtTime', 
                     '$praying', 
                     '$prayingAlarm', 
-                    '$prayingTime', 
-                    '$prayingDuration', 
+                    '".mysqli_real_escape_string($connection, $prayingTime)."', 
+                    '".mysqli_real_escape_string($connection, $prayingDuration)."', 
                     '$biblePlanId',
                     NOW());";
             
