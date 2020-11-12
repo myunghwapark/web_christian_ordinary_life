@@ -17,7 +17,7 @@
 
     <ul>
         <li>Name, e-mail, password: used for identification procedures according to membership service use</li>
-        <li>Require camera usage and album permission: Allows uploading of photos in the audit diary using cameras and albums</li>
+        <li>Require camera usage and album permission: Allows uploading of photos in the thanks diary using cameras and albums</li>
     </ul>
      <div><p>
       The app does use third party services that may collect
