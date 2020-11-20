@@ -14,6 +14,8 @@ try {
     $auch = $jwtCls->dehashing($jwt, $userSeqNo);
     
     if($auch) {
+            
+        $jwt = $jwtCls->hashing($userSeqNo, $keepLogin);
 
         $result = getGoalProgress($userSeqNo, $goalDate);
         $numResults = mysqli_num_rows($result);
@@ -22,7 +24,7 @@ try {
 
         if($numResults > 0) {
 
-            echo '{"result":"success", "goalProgress":[';
+            echo '{"result":"success", "jwt": "'.$jwt.'", "goalProgress":[';
 
             $goalSeqNo = "";
             $readingBible = "";

@@ -41,7 +41,7 @@ try {
 
 	}
 	else {
-		echo '{"result":"fail", "errorCode": "01", "errorMessage":"'.$commonError["message"].'"}';
+		echo '{"result":"fail", "errorCode": "01", "errorMessage":"There is no user matching the registered email or password."}';
 	}
 }
 catch (Exception $e) {
