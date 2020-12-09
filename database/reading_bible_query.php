@@ -183,7 +183,9 @@
     function getCurrentBiblePlanSeqNo($userSeqNo) {
         global $connection;
         $query = "Select 
-            user_bible_plan_seq_no userBiblePlanSeqNo
+            user_bible_plan_seq_no userBiblePlanSeqNo,
+            plan_start_date planStartDate,
+            plan_end_date planEndDate
         from tbUserBiblePlan 
         where plan_status = 'P002_001'
             and user_seq_no='$userSeqNo'

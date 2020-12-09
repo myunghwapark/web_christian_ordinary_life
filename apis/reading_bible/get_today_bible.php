@@ -15,6 +15,8 @@ try {
     $readingBible = '';
     $biblePlanId = '';
     $userBiblePlanSeqNo = '';
+    $planStartDate = '';
+    $planEndDate = '';
 
     $days = '';
     $chapter = '';
@@ -48,6 +50,8 @@ try {
 
                     while($row = mysqli_fetch_array($biblePlanResult)){
                         $userBiblePlanSeqNo = $row['userBiblePlanSeqNo'];
+                        $planStartDate = $row['planStartDate'];
+                        $planEndDate = $row['planEndDate'];
                     }
 
 
@@ -105,7 +109,7 @@ try {
                             $days = $row['days'];
                             $chapter = $row['chapter'];
                         }
-                        echo '{"result":"success", "jwt": "'.$jwt.'", "days": "'.$days.'", "chapter": '.json_encode($chapter).', "biblePlanId": "'.$biblePlanId.'", "bibleProgress": "'.$bibleProgress.'", "lastDay": "'.$lastDay.'"}';
+                        echo '{"result":"success", "jwt": "'.$jwt.'", "days": "'.$days.'", "chapter": '.json_encode($chapter).', "biblePlanId": "'.$biblePlanId.'", "bibleProgress": "'.$bibleProgress.'", "lastDay": "'.$lastDay.'", "planStartDate": "'.$planStartDate.'", "planEndDate": "'.$planEndDate.'"}';
                     }
                     else {
                         echo '{"result":"fail", "jwt": "'.$jwt.'", "errorCode": "03", "errorMessage": "Can not find the chapter for today."}';

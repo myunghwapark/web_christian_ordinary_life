@@ -6,8 +6,12 @@
                 goal_seq_no goalSeqNo, 
                 A.user_seq_no userSeqNo, 
                 B.user_bible_plan_seq_no userBiblePlanSeqNo,
-                IF(reading_bible, 'true', 'false') as readingBible, 
+                IF(IFNULL(reading_bible, 0), 'true', 'false') as readingBible, 
+                IF(reading_bible_alarm, 'true', 'false') as readingBibleAlarm,
+                reading_bible_time readingBibleTime,
                 IF(thank_diary, 'true', 'false') as thankDiary, 
+                IF(IFNULL(thank_diary_alarm, 0), 'true', 'false') as thankDiaryAlarm,
+                thank_diary_time thankDiaryTime, 
                 IF(qt_record, 'true', 'false') as qtRecord, 
                 IF(qt_alarm, 'true', 'false') as qtAlarm,
                 qt_time qtTime,
@@ -37,13 +41,17 @@
     }
 
 
-	function setUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration) {
+	function setUserGoal($userSeqNo, $readingBible, $readingBibleAlarm, $readingBibleTime, $thankDiary, $thankDiaryAlarm, $thankDiaryTime, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration) {
         try {
             global $connection;
             $query = "Insert into tbGoal(
                 user_seq_no, 
                 reading_bible, 
+                reading_bible_alarm,
+                reading_bible_time,
                 thank_diary, 
+                thank_diary_alarm, 
+                thank_diary_time, 
                 qt_record, 
                 qt_alarm,
                 qt_time,
@@ -57,7 +65,11 @@
                 values(
                     '$userSeqNo', 
                     '$readingBible', 
+                    '$readingBibleAlarm', 
+                    '$readingBibleTime', 
                     '$thankDiary', 
+                    '$thankDiaryAlarm', 
+                    '$thankDiaryTime', 
                     '$qtRecord', 
                     '$qtAlarm', 
                     '$qtTime', 
@@ -80,12 +92,16 @@
         }
     }
 
-	function updateUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration) {
+	function updateUserGoal($userSeqNo, $readingBible, $readingBibleAlarm, $readingBibleTime, $thankDiary, $thankDiaryAlarm, $thankDiaryTime, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration) {
         try {
             global $connection;
             $query = "Update tbGoal set 
             reading_bible='$readingBible', 
+            reading_bible_alarm='$readingBibleAlarm', 
+            reading_bible_time='$readingBibleTime', 
             thank_diary='$thankDiary', 
+            thank_diary_alarm='$thankDiaryAlarm', 
+            thank_diary_time='$thankDiaryTime', 
             qt_record='$qtRecord', 
             qt_time='$qtTime', 
             qt_alarm='$qtAlarm', 
@@ -126,13 +142,17 @@
         }
     }
 
-	function insertUserGoalHistory($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration, $biblePlanId) {
+	function insertUserGoalHistory($userSeqNo, $readingBible, $readingBibleAlarm, $readingBibleTime, $thankDiary, $thankDiaryAlarm, $thankDiaryTime, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration, $biblePlanId) {
         try {
             global $connection;
             $query = "Insert into tbGoalHistory(
                 user_seq_no, 
                 reading_bible, 
+                reading_bible_alarm,
+                reading_bible_time,
                 thank_diary, 
+                thank_diary_alarm,
+                thank_diary_time,
                 qt_record, 
                 qt_alarm,
                 qt_time,
@@ -146,7 +166,11 @@
                 values(
                     '$userSeqNo', 
                     '$readingBible', 
+                    '$readingBibleAlarm', 
+                    '$readingBibleTime', 
                     '$thankDiary', 
+                    '$thankDiaryAlarm', 
+                    '$thankDiaryTime', 
                     '$qtRecord', 
                     '$qtAlarm', 
                     '$qtTime', 

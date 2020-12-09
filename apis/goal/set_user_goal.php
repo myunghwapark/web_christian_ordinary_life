@@ -30,7 +30,11 @@ try {
       
     $userSeqNo = $obj['userSeqNo'];
     $readingBible = $obj['readingBible'];
+    $readingBibleAlarm = $obj['readingBibleAlarm'] ?? null;
+    $readingBibleTime = $obj['readingBibleTime'] ?? null;
     $thankDiary = $obj['thankDiary'];
+    $thankDiaryAlarm = $obj['thankDiaryAlarm'] ?? null;
+    $thankDiaryTime = $obj['thankDiaryTime'] ?? null;
     $qtRecord = $obj['qtRecord'];
     $qtAlarm = $obj['qtAlarm'];
     $qtTime = $obj['qtTime'];
@@ -71,7 +75,7 @@ try {
         // Goal setting (If there is goal for the user, insert otherwise update.)
         if($goalResultCnt == 0) {
 
-            $setGoalResult = setUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration);
+            $setGoalResult = setUserGoal($userSeqNo, $readingBible, $readingBibleAlarm, $readingBibleTime, $thankDiary, $thankDiaryAlarm, $thankDiaryTime, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration);
     
             if($setGoalResult == 1) {
                 $goalResultStatus = true;
@@ -82,7 +86,7 @@ try {
             } 
         }
         else {
-            $setGoalResult = updateUserGoal($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration);
+            $setGoalResult = updateUserGoal($userSeqNo, $readingBible, $readingBibleAlarm, $readingBibleTime, $thankDiary, $thankDiaryAlarm, $thankDiaryTime, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration);
 
     
             if($setGoalResult == 1) {
@@ -93,7 +97,7 @@ try {
             } 
         }
 
-        insertUserGoalHistory($userSeqNo, $readingBible, $thankDiary, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration, $biblePlanId);
+        insertUserGoalHistory($userSeqNo, $readingBible, $readingBibleAlarm, $readingBibleTime, $thankDiary, $thankDiaryAlarm, $thankDiaryTime, $qtRecord, $qtAlarm, $qtTime, $praying, $prayingAlarm, $prayingTime, $prayingDuration, $biblePlanId);
 
         $getBiblePlanResult = getUserBiblePlanSeqNo($userSeqNo);
         $biblePlanResultCnt = mysqli_num_rows($getBiblePlanResult);
