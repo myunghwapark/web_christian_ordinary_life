@@ -26,7 +26,7 @@ try {
         
         $numResults = mysqli_num_rows($listResult);
         
-        $totalCntResult = getThankDiaryTotalCnt($userSeqNo, $searchKeyword);
+        $totalCntResult = getThankDiaryTotalCnt($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $categoryNo);
         $totalCntRow = mysqli_fetch_assoc($totalCntResult);
         $totalCnt = $totalCntRow['totalCnt'];
 

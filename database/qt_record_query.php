@@ -29,18 +29,21 @@
     }
 
 
-    function getQtRecordTotalCnt($userSeqNo, $searchKeyword) {
+    function getQtRecordTotalCnt($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate) {
         global $connection;
         
         $searchQuery = "";
         if($searchKeyword != null && $searchKeyword != '') {
-            $searchQuery = " and title LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or content LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or bible LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' ";
+            $searchQuery = " and (title LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or content LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or bible LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%') ";
+        }
+        if($searchStartDate != null && $searchStartDate != '') {
+            $searchQuery .= " and date(qt_date) between date('$searchStartDate') and date('$searchEndDate')";
         }
         $query = "Select 
             count(qt_record_seq_no) totalCnt
             from tbQtRecord 
             where user_seq_no = '$userSeqNo'  $searchQuery;";
-            
+
         $result = mysqli_query($connection, $query);
 
         if($result == false) {

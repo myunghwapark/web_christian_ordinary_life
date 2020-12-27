@@ -24,7 +24,7 @@ try {
         
         $numResults = mysqli_num_rows($listResult);
         
-        $totalCntResult = getQtRecordTotalCnt($userSeqNo, $searchKeyword);
+        $totalCntResult = getQtRecordTotalCnt($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate);
         $totalCntRow = mysqli_fetch_assoc($totalCntResult);
         $totalCnt = $totalCntRow['totalCnt'];
 

@@ -32,12 +32,18 @@
         return $result;
     }
 
-    function getThankDiaryTotalCnt($userSeqNo, $searchKeyword) {
+    function getThankDiaryTotalCnt($userSeqNo, $searchKeyword, $searchStartDate, $searchEndDate, $categoryNo) {
         global $connection;
         
         $searchQuery = "";
         if($searchKeyword != null && $searchKeyword != '') {
-            $searchQuery = " and title LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or content LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' ";
+            $searchQuery = " and (title LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%' or content LIKE '%".mysqli_real_escape_string($connection, $searchKeyword)."%') ";
+        }
+        if($searchStartDate != null && $searchStartDate != '') {
+            $searchQuery .= " and date(diary_date) between date('$searchStartDate') and date('$searchEndDate')";
+        }
+        if($categoryNo != null && $categoryNo != '') {
+            $searchQuery .= " and thank_category_no = '$categoryNo'";
         }
         $query = "Select 
             count(thank_diary_seq_no) totalCnt
